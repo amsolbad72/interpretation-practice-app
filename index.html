@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simultaneous Interpretation Practice App</title>
+
+    <!-- YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <style>
+        /* Basic page settings */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh; /* Full screen height */
+            display: flex;
+            flex-direction: column; /* Stack vertically */
+        }
+
+        /* Top section: Video area */
+        .video-section {
+            flex: 2; /* Takes 2/3 of screen */
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Video upload controls */
+        .video-upload-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+            align-items: center;
+        }
+
+        .upload-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+
+        .youtube-input {
+            padding: 12px;
+            font-size: 14px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            background-color: #222;
+            color: white;
+            width: 300px;
+        }
+
+        .youtube-input:focus {
+            outline: none;
+            border-color: #ff0000;
+        }
+
+        .youtube-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .youtube-btn:hover {
+            background-color: #cc0000;
+        }
+
+        .change-video-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .change-video-btn:hover {
+            background-color: #e68900;
+        }
+
+        /* Recording controls */
+        .recording-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            z-index: 10;
+            max-width: 600px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .record-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .record-btn.start {
+            background-color: #ff4444;
+            color: white;
+        }
+
+        .record-btn.start:hover {
+            background-color: #cc0000;
+        }
+
+        .record-btn.stop {
+            background-color: #444;
+            color: white;
+        }
+
+        .record-btn.stop:hover {
+            background-color: #666;
+        }
+
+        .record-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Recording indicator */
+        .recording-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 68, 68, 0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .recording-indicator.active {
+            display: flex;
+        }
+
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        video {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* YouTube container styling */
+        #youtube-container {
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #youtube-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Bottom section: Timeline area */
+        .timeline-section {
+            flex: 1; /* Takes 1/3 of screen */
+            background-color: #2c2c2c;
+            padding: 20px;
+            overflow-x: auto; /* Horizontal scroll enabled */
+        }
+
+        .timeline {
+            background-color: #1a1a1a;
+            height: 100%;
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            overflow-x: auto;
+        }
+
+        /* Timeline ruler (time markers) */
+        .timeline-ruler {
+            height: 30px;
+            background-color: #0a0a0a;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            position: relative;
+            display: flex;
+        }
+
+        .time-marker {
+            position: absolute;
+            color: #888;
+            font-size: 11px;
+            user-select: none;
+        }
+
+        .time-tick {
+            position: absolute;
+            width: 1px;
+            height: 8px;
+            background-color: #444;
+            bottom: 0;
+        }
+
+        /* Timeline tracks */
+        .timeline-track {
+            display: flex;
+            margin-bottom: 8px;
+            background-color: #222;
+            border-radius: 4px;
+            overflow: visible;
+        }
+
+        .track-label {
+            width: 100px;
+            padding: 10px;
+            background-color: #333;
+            color: #aaa;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid #444;
+        }
+
+        .track-content {
+            flex: none;
+            position: relative;
+            min-height: 50px;
+            background: repeating-linear-gradient(
+                90deg,
+                #1a1a1a 0px,
+                #1a1a1a 49px,
+                #252525 49px,
+                #252525 50px
+            );
+        }
+
+        /* Playhead (current time indicator) */
+        .playhead {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background-color: #ff4444;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .playhead::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #ff4444;
+        }
+
+        /* Recording clips on timeline */
+        .recording-clip {
+            position: absolute;
+            height: 40px;
+            background-color: #ff6b6b;
+            border-radius: 4px;
+            border: 1px solid #ff4444;
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 11px;
+            top: 5px;
+            overflow: hidden;
+        }
+
+        /* Individual transcript segment clips */
+        .transcript-segment {
+            position: absolute;
+            height: 30px;
+            border-radius: 3px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            top: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 2px 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .transcript-segment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+            z-index: 10;
+        }
+
+        /* Selected state: when user clicks a segment to review */
+        .transcript-segment.selected {
+            border-color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Playing state: glowing animation when audio is playing */
+        .transcript-segment.playing {
+            border-color: #fff;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+            animation: glow 1s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); }
+            50% { box-shadow: 0 0 16px rgba(255, 255, 255, 0.8); }
+        }
+
+        .clip-content {
+            flex: 1;
+            padding: 5px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .clip-content:active {
+            cursor: grabbing;
+        }
+
+        /* Clip handles (for trimming) */
+        .clip-handle {
+            width: 8px;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: ew-resize;
+            transition: background-color 0.2s;
+        }
+
+        .clip-handle:hover {
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .clip-handle-left {
+            border-right: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .clip-handle-right {
+            border-left: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Language selector group */
+        .language-selector-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .language-selector label {
+            font-size: 12px;
+            color: #aaa;
+            font-weight: bold;
+        }
+
+        .language-select {
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .language-select:focus {
+            outline: none;
+            border-color: #ff4444;
+        }
+
+        /* Export button */
+        .export-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .export-btn:hover:not(:disabled) {
+            background-color: #1976D2;
+        }
+
+        .export-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Speed control */
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .speed-control label {
+            font-size: 12px;
+            color: #aaa;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .speed-btn {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #555;
+            border-radius: 6px;
+            background-color: #333;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .speed-btn:hover {
+            background-color: #444;
+            color: white;
+        }
+
+        .speed-btn.active {
+            background-color: #ff4444;
+            color: white;
+            border-color: #ff4444;
+        }
+
+        /* Timeline header */
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .shortcut-hints {
+            display: flex;
+            gap: 12px;
+        }
+
+        .shortcut-hints span {
+            font-size: 11px;
+            color: #666;
+            background-color: #2a2a2a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        /* Subtitle overlay */
+        .subtitle-overlay {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            padding: 15px 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .subtitle-overlay.active {
+            opacity: 1;
+        }
+
+        .subtitle-text {
+            color: white;
+            font-size: 20px;
+            line-height: 1.5;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top section: Video area -->
+    <div class="video-section">
+        <!-- Video upload controls -->
+        <div class="video-upload-controls">
+            <label for="video-file-input" class="upload-btn">📁 Upload Video</label>
+            <input type="file" id="video-file-input" accept="video/*" style="display: none;">
+            <input type="text" id="youtube-url-input" placeholder="Or paste YouTube URL..." class="youtube-input">
+            <button id="load-youtube-btn" class="youtube-btn">Load YouTube</button>
+            <button id="change-video-btn" class="change-video-btn" style="display: none;">🔄 Change Video</button>
+        </div>
+
+        <!-- Recording controls -->
+        <div class="recording-controls">
+            <div class="recording-indicator" id="recording-indicator">
+                <div class="recording-dot"></div>
+                <span>Recording...</span>
+            </div>
+            <button class="record-btn start" id="start-record-btn">🎙️ Start Recording</button>
+            <button class="record-btn stop" id="stop-record-btn" disabled>⏹️ Stop Recording</button>
+
+            <!-- Language selectors -->
+            <div class="language-selector-group">
+                <div class="language-selector">
+                    <label for="source-language">Source:</label>
+                    <select id="source-language" class="language-select">
+                        <option value="en-US" selected>English</option>
+                        <option value="ko-KR">한국어</option>
+                        <option value="fr-FR">Français</option>
+                        <option value="de-DE">Deutsch</option>
+                        <option value="ja-JP">日本語</option>
+                    </select>
+                </div>
+                <div class="language-selector">
+                    <label for="target-language">→ Target:</label>
+                    <select id="target-language" class="language-select">
+                        <option value="en-US">English</option>
+                        <option value="ko-KR" selected>한국어</option>
+                        <option value="fr-FR">Français</option>
+                        <option value="de-DE">Deutsch</option>
+                        <option value="ja-JP">日本語</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Export button -->
+            <button class="export-btn" id="export-btn" disabled>💾 Export</button>
+
+            <!-- Speed control -->
+            <div class="speed-control">
+                <label>Speed:</label>
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn" data-speed="0.75">0.75x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="1.25">1.25x</button>
+                <button class="speed-btn" data-speed="1.5">1.5x</button>
+            </div>
+        </div>
+
+        <!-- Live subtitles overlay -->
+        <div class="subtitle-overlay" id="subtitle-overlay">
+            <div class="subtitle-text" id="subtitle-text"></div>
+        </div>
+
+        <video id="main-video" controls>
+            <source src="video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- YouTube iframe container (hidden by default) -->
+        <div id="youtube-container" style="display: none;">
+            <div id="youtube-player"></div>
+        </div>
+    </div>
+
+    <!-- Bottom section: Timeline area -->
+    <div class="timeline-section">
+        <div class="timeline">
+            <div class="timeline-header">
+                <h3>Timeline</h3>
+                <div class="shortcut-hints">
+                    <span>SPACE: Record</span>
+                    <span>ESC: Stop</span>
+                    <span>←→: Skip 5s</span>
+                </div>
+            </div>
+
+            <!-- Timeline ruler (shows seconds) -->
+            <div class="timeline-ruler" id="timeline-ruler">
+                <!-- Time markers will be generated by JavaScript -->
+            </div>
+
+            <!-- Video track -->
+            <div class="timeline-track">
+                <div class="track-label">Video</div>
+                <div class="track-content" id="video-track">
+                    <div class="playhead" id="playhead"></div>
+                </div>
+            </div>
+
+            <!-- Audio tracks (recordings) -->
+            <div class="timeline-track">
+                <div class="track-label">Recordings</div>
+                <div class="track-content" id="recordings-track">
+                    <!-- Recording clips will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript code will go here
+        console.log('Simultaneous Interpretation Practice App started!');
+
+        // ============================================
+        // GET ALL HTML ELEMENTS FIRST
+        // ============================================
+
+        // Video elements (needed by multiple sections)
+        const videoFileInput = document.getElementById('video-file-input');
+        const mainVideo = document.getElementById('main-video');
+        const youtubeUrlInput = document.getElementById('youtube-url-input');
+        const loadYoutubeBtn = document.getElementById('load-youtube-btn');
+        const youtubeContainer = document.getElementById('youtube-container');
+        const youtubePlayer = document.getElementById('youtube-player');
+        const changeVideoBtn = document.getElementById('change-video-btn');
+        const exportBtn = document.getElementById('export-btn');
+
+        // YouTube Player object (for API control)
+        let ytPlayer = null;
+        let isYouTubeActive = false;
+        let youtubeAPIReady = false;
+
+        // This function is called automatically when YouTube IFrame API is ready
+        window.onYouTubeIframeAPIReady = function() {
+            console.log('✅ YouTube IFrame API is ready!');
+            youtubeAPIReady = true;
+        };
+
+        // Recording elements
+        const startRecordBtn = document.getElementById('start-record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const recordingIndicator = document.getElementById('recording-indicator');
+
+        // Timeline elements
+        const timelineRuler = document.getElementById('timeline-ruler');
+        const videoTrack = document.getElementById('video-track');
+        const recordingsTrack = document.getElementById('recordings-track');
+        const playhead = document.getElementById('playhead');
+
+        // ============================================
+        // TIMELINE FUNCTIONALITY
+        // ============================================
+
+        // Timeline settings
+        const PIXELS_PER_SECOND = 50;  // 1 second = 50 pixels
+        const TIMELINE_DURATION = 600;  // 10 minutes (600 seconds)
+
+        // Function: Create timeline ruler (time markers)
+        function createTimelineRuler() {
+            // Calculate total width
+            const totalWidth = TIMELINE_DURATION * PIXELS_PER_SECOND;
+            timelineRuler.style.width = totalWidth + 'px';
+            videoTrack.style.width = totalWidth + 'px';
+            recordingsTrack.style.width = totalWidth + 'px';
+
+            // Clear existing markers
+            timelineRuler.innerHTML = '';
+
+            // Create markers every second
+            for (let second = 0; second <= TIMELINE_DURATION; second++) {
+                const position = second * PIXELS_PER_SECOND;
+
+                // Create tick mark (small line)
+                const tick = document.createElement('div');
+                tick.className = 'time-tick';
+                tick.style.left = position + 'px';
+                timelineRuler.appendChild(tick);
+
+                // Create time label every 5 seconds
+                if (second % 5 === 0) {
+                    const marker = document.createElement('div');
+                    marker.className = 'time-marker';
+                    marker.style.left = position + 'px';
+                    marker.textContent = formatTime(second);
+                    timelineRuler.appendChild(marker);
+                }
+            }
+
+            console.log('✅ Timeline ruler created!');
+        }
+
+        // Function: Format seconds to MM:SS
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return minutes + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+
+        // Function: Update playhead position based on video time
+        function updatePlayhead() {
+            let currentTime = 0;
+            let isPlaying = false;
+
+            // Get current time from YouTube or regular video
+            if (isYouTubeActive && ytPlayer && ytPlayer.getCurrentTime) {
+                try {
+                    currentTime = ytPlayer.getCurrentTime();
+                    // Check if YouTube video is playing
+                    const playerState = ytPlayer.getPlayerState();
+                    isPlaying = (playerState === 1); // YT.PlayerState.PLAYING = 1
+                } catch (error) {
+                    // YouTube player not ready yet
+                    currentTime = 0;
+                    isPlaying = false;
+                }
+            } else if (mainVideo && !mainVideo.paused) {
+                currentTime = mainVideo.currentTime;
+                isPlaying = true;
+            }
+
+            // Update playhead position
+            if (isPlaying || isYouTubeActive) {
+                const position = currentTime * PIXELS_PER_SECOND;
+                playhead.style.left = position + 'px';
+
+                // Auto-scroll timeline to follow playhead
+                const timelineSection = document.querySelector('.timeline-section');
+                timelineSection.scrollLeft = position - 200;
+            }
+
+            // Keep updating
+            requestAnimationFrame(updatePlayhead);
+        }
+
+        // Function to get current video time (works for both YouTube and regular video)
+        function getCurrentVideoTime() {
+            if (isYouTubeActive && ytPlayer && ytPlayer.getCurrentTime) {
+                try {
+                    return ytPlayer.getCurrentTime();
+                } catch (error) {
+                    return 0;
+                }
+            } else if (mainVideo) {
+                return mainVideo.currentTime;
+            }
+            return 0;
+        }
+
+        // Initialize timeline
+        createTimelineRuler();
+        updatePlayhead();
+
+        // ============================================
+        // VIDEO UPLOAD FUNCTIONALITY
+        // ============================================
+
+        // Listen for when user selects a video file
+        videoFileInput.addEventListener('change', function(event) {
+            // Get the file that user selected
+            const file = event.target.files[0];
+
+            // Check if user actually selected a file
+            if (file) {
+                console.log('📁 File selected:', file.name);
+
+                // Create a temporary URL for the video file
+                const videoUrl = URL.createObjectURL(file);
+
+                // Change the video player's source to this new file
+                mainVideo.src = videoUrl;
+
+                // Show the video player, hide YouTube
+                mainVideo.style.display = 'block';
+                youtubeContainer.style.display = 'none';
+                isYouTubeActive = false;  // Using regular video now
+
+                // Stop YouTube player if it's playing
+                if (ytPlayer && ytPlayer.pauseVideo) {
+                    ytPlayer.pauseVideo();
+                }
+
+                // Start playing the video
+                mainVideo.load();
+
+                // Switch buttons: hide Load, show Change
+                loadYoutubeBtn.style.display = 'none';
+                youtubeUrlInput.style.display = 'none';
+                changeVideoBtn.style.display = 'inline-block';
+
+                console.log('✅ Video loaded successfully!');
+            }
+        });
+
+        // Listen for YouTube button click
+        loadYoutubeBtn.addEventListener('click', function() {
+            // Get the URL that user typed
+            const url = youtubeUrlInput.value.trim();
+
+            // Check if user typed something
+            if (url === '') {
+                alert('Please enter a YouTube URL!');
+                return;
+            }
+
+            console.log('🔗 Loading YouTube URL:', url);
+
+            // Extract YouTube video ID from the URL
+            let videoId = extractYouTubeVideoId(url);
+
+            if (videoId) {
+                // Load YouTube video using IFrame API
+                loadYouTubeVideo(videoId);
+
+                // Switch buttons: hide Load, show Change
+                loadYoutubeBtn.style.display = 'none';
+                youtubeUrlInput.style.display = 'none';
+                changeVideoBtn.style.display = 'inline-block';
+            } else {
+                alert('Invalid YouTube URL. Please try again!');
+            }
+        });
+
+        // Listen for Change Video button click
+        changeVideoBtn.addEventListener('click', function() {
+            // Stop YouTube player
+            if (ytPlayer && ytPlayer.destroy) {
+                ytPlayer.destroy();
+                youtubeContainer.innerHTML = '<div id="youtube-player"></div>';
+            }
+
+            // Hide YouTube, show regular video placeholder
+            youtubeContainer.style.display = 'none';
+            mainVideo.style.display = 'block';
+            isYouTubeActive = false;
+            ytPlayer = null;
+
+            // Switch buttons back: show Load, hide Change
+            youtubeUrlInput.value = '';
+            youtubeUrlInput.style.display = 'inline-block';
+            loadYoutubeBtn.style.display = 'inline-block';
+            changeVideoBtn.style.display = 'none';
+
+            console.log('🔄 Ready to load a new video!');
+        });
+
+        // Function to load YouTube video using IFrame API
+        function loadYouTubeVideo(videoId) {
+            // Check if running from file:// protocol (YouTube blocks this)
+            if (window.location.protocol === 'file:') {
+                alert('⚠️ YouTube embedding does not work when opening the HTML file directly.\n\nPlease run a local server:\n1. Open terminal in this folder\n2. Run: python -m http.server 8000\n3. Open: http://localhost:8000');
+                console.error('❌ Cannot embed YouTube from file:// protocol. Use a local server.');
+                return;
+            }
+
+            // Check if YouTube API is ready
+            if (!youtubeAPIReady || typeof YT === 'undefined') {
+                alert('⏳ YouTube API is loading... Please wait a moment and try again.');
+                console.log('⚠️ YouTube API not ready yet');
+                return;
+            }
+
+            // Show YouTube player, hide video player
+            mainVideo.style.display = 'none';
+            youtubeContainer.style.display = 'block';
+            isYouTubeActive = true;
+
+            // Destroy existing player if any
+            if (ytPlayer && ytPlayer.destroy) {
+                ytPlayer.destroy();
+                // Recreate the div since YT.Player replaces it
+                youtubeContainer.innerHTML = '<div id="youtube-player"></div>';
+            }
+
+            // Create new YouTube player
+            ytPlayer = new YT.Player('youtube-player', {
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 1,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'fs': 1,
+                    'enablejsapi': 1,
+                    'origin': window.location.origin
+                },
+                events: {
+                    'onReady': onYouTubePlayerReady,
+                    'onStateChange': onYouTubePlayerStateChange,
+                    'onError': onYouTubePlayerError
+                }
+            });
+
+            console.log('✅ YouTube video loading with IFrame API...');
+        }
+
+        // YouTube Player ready event
+        function onYouTubePlayerReady(event) {
+            console.log('✅ YouTube Player ready!');
+        }
+
+        // YouTube Player state change event
+        function onYouTubePlayerStateChange(event) {
+            // YT.PlayerState.PLAYING = 1
+            // YT.PlayerState.PAUSED = 2
+            // YT.PlayerState.ENDED = 0
+            console.log('▶️ YouTube Player state:', event.data);
+        }
+
+        // YouTube Player error event
+        function onYouTubePlayerError(event) {
+            const errorMessages = {
+                2: 'Invalid video ID',
+                5: 'HTML5 player error',
+                100: 'Video not found or removed',
+                101: 'Video owner does not allow embedding',
+                150: 'Video owner does not allow embedding (same as 101)'
+            };
+            const msg = errorMessages[event.data] || 'Unknown error (code: ' + event.data + ')';
+            console.error('❌ YouTube Error:', event.data, msg);
+            alert('❌ YouTube Error: ' + msg + '\n\nThis video cannot be embedded. Try a different video.\n\nExample (TED Talk):\nhttps://www.youtube.com/watch?v=kfVsfOSbJY0');
+        }
+
+        // Helper function: Extract video ID from YouTube URL
+        function extractYouTubeVideoId(url) {
+            // YouTube URLs can be in different formats:
+            // https://www.youtube.com/watch?v=VIDEO_ID
+            // https://youtu.be/VIDEO_ID
+
+            // Try the first format
+            let match = url.match(/[?&]v=([^&]+)/);
+            if (match) {
+                return match[1];
+            }
+
+            // Try the second format
+            match = url.match(/youtu\.be\/([^?]+)/);
+            if (match) {
+                return match[1];
+            }
+
+            // If no match found
+            return null;
+        }
+
+        // ============================================
+        // RECORDING FUNCTIONALITY
+        // ============================================
+
+        // Variables to store recording state
+        let mediaRecorder = null;  // This will handle the actual recording
+        let audioChunks = [];      // This will store the recorded audio data
+        let recordedAudios = [];   // This will store all completed recordings
+        let audioStream = null;    // Store the microphone stream (to avoid asking permission multiple times)
+
+        // Speech recognition variables
+        let recognition = null;    // Will handle speech-to-text
+        let currentTranscript = '';  // Current transcription text
+        let finalTranscript = '';    // Final transcription text
+        let transcriptSegments = [];  // Array to store transcript with timestamps: [{time: 5.2, text: "hello"}, ...]
+
+        // Temporary storage for current recording (waiting for transcript to complete)
+        let pendingRecording = null;  // Stores audio data while waiting for recognition to finish
+
+        // Flag to track if we're actively recording (to prevent transcript reset on auto-restart)
+        let isRecording = false;
+
+        // Store the video time when recording started (to calculate audio offsets)
+        let recordingStartVideoTime = 0;
+
+        // Currently playing audio (so we can stop it when clicking another segment)
+        let currentlyPlayingAudio = null;
+
+        // Get language and subtitle elements
+        const sourceLanguage = document.getElementById('source-language');
+        const targetLanguage = document.getElementById('target-language');
+        const subtitleOverlay = document.getElementById('subtitle-overlay');
+        const subtitleText = document.getElementById('subtitle-text');
+
+        // ============================================
+        // SPEECH RECOGNITION SETUP
+        // ============================================
+
+        // Check if browser supports speech recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+
+            // Settings
+            recognition.continuous = true;  // Keep recognizing until we stop
+            recognition.interimResults = true;  // Show results in real-time
+            recognition.maxAlternatives = 1;  // Only get best result
+            recognition.lang = targetLanguage.value;  // Set to TARGET language (interpretation language)
+
+            // Track the latest interim text so we can save it when recording stops
+            let lastInterimTranscript = '';
+            let lastInterimTime = 0;
+
+            // Event: When speech is recognized
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+
+                // Loop through all results
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+
+                    if (event.results[i].isFinal) {
+                        // This result is final (user paused speaking)
+                        // Save with timestamp!
+                        const currentTime = getCurrentVideoTime();
+
+                        transcriptSegments.push({
+                            time: currentTime,
+                            text: transcript.trim()
+                        });
+
+                        // Also add to finalTranscript for display
+                        finalTranscript += transcript + ' ';
+
+                        // Clear interim since it's now final
+                        lastInterimTranscript = '';
+
+                        console.log(`✅ [${formatTime(Math.floor(currentTime))}] ${transcript}`);
+                    } else {
+                        // This result is interim (still speaking)
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // Save the latest interim text and its video time
+                if (interimTranscript.trim()) {
+                    lastInterimTranscript = interimTranscript.trim();
+                    lastInterimTime = getCurrentVideoTime();
+                }
+
+                // Combine final and interim
+                currentTranscript = finalTranscript + interimTranscript;
+
+                // Display subtitle
+                if (currentTranscript.trim()) {
+                    subtitleText.textContent = currentTranscript;
+                    subtitleOverlay.classList.add('active');
+                }
+
+                console.log('📝 Current transcription:', currentTranscript);
+            };
+
+            // Event: When recognition starts
+            recognition.onstart = function() {
+                console.log('🎤 Speech recognition started');
+
+                // Only reset transcript if this is a NEW recording session
+                // Don't reset if recognition auto-restarted during an ongoing recording
+                if (!isRecording) {
+                    console.log('   → New recording session, resetting transcript');
+                    currentTranscript = '';
+                    finalTranscript = '';
+                    transcriptSegments = [];  // Clear timestamped segments too
+                } else {
+                    console.log('   → Auto-restart during recording, keeping existing transcript');
+                }
+            };
+
+            // Event: When recognition ends
+            recognition.onend = function() {
+                console.log('🎤 Speech recognition ended');
+                console.log('📝 Final complete transcript:', finalTranscript);
+
+                // If we're still recording (recognition auto-stopped), restart it
+                if (isRecording && !pendingRecording) {
+                    console.log('⚠️ Recognition auto-stopped during recording, restarting...');
+
+                    // Save any interim text BEFORE restarting!
+                    // (Otherwise it gets overwritten and lost when new results come in)
+                    if (lastInterimTranscript) {
+                        console.log('📝 Saving interim text before auto-restart:', lastInterimTranscript);
+                        transcriptSegments.push({
+                            time: lastInterimTime,
+                            text: lastInterimTranscript
+                        });
+                        finalTranscript += lastInterimTranscript + ' ';
+                        lastInterimTranscript = '';
+                    }
+
+                    try {
+                        recognition.start();
+                    } catch (error) {
+                        console.error('Error restarting recognition:', error);
+                    }
+                    return;  // Don't process the rest
+                }
+
+                // If there's a pending recording, save it now with the complete transcript
+                if (pendingRecording) {
+                    console.log('💾 Saving recording with complete transcript...');
+
+                    // Save any remaining interim text as a final segment
+                    // (This catches text that was still being processed when recording stopped)
+                    if (lastInterimTranscript) {
+                        console.log('📝 Saving remaining interim text:', lastInterimTranscript);
+                        transcriptSegments.push({
+                            time: lastInterimTime,
+                            text: lastInterimTranscript
+                        });
+                        finalTranscript += lastInterimTranscript + ' ';
+                        lastInterimTranscript = '';
+                    }
+
+                    // Add the final transcript to the recording
+                    pendingRecording.transcript = finalTranscript.trim();
+
+                    // Add timestamped segments to the recording
+                    pendingRecording.segments = [...transcriptSegments];  // Copy the array
+
+                    // Save to the recordings array
+                    recordedAudios.push(pendingRecording);
+                    console.log('✅ Recording saved with transcript:', pendingRecording.transcript);
+                    console.log('   Segments:', pendingRecording.segments);
+
+                    // Enable export button (now we have something to export!)
+                    exportBtn.disabled = false;
+
+                    // Display this recording in the timeline
+                    displayRecordingInTimeline(pendingRecording);
+
+                    // Clear pending recording
+                    pendingRecording = null;
+
+                    // Reset transcripts for next recording
+                    currentTranscript = '';
+                    finalTranscript = '';
+                    transcriptSegments = [];  // Clear timestamped segments
+                    isRecording = false;  // Recording session is now complete
+                }
+
+                // Hide subtitle after 2 seconds
+                setTimeout(function() {
+                    subtitleOverlay.classList.remove('active');
+                }, 2000);
+            };
+
+            // Event: If error occurs
+            recognition.onerror = function(event) {
+                console.error('❌ Speech recognition error:', event.error);
+                if (event.error === 'no-speech') {
+                    console.log('No speech detected');
+                }
+            };
+        } else {
+            console.warn('⚠️ Speech recognition not supported in this browser');
+            alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
+        }
+
+        // Update recognition language when target language changes
+        targetLanguage.addEventListener('change', function() {
+            if (recognition) {
+                recognition.lang = targetLanguage.value;
+                console.log('🌐 Target language changed to:', targetLanguage.value);
+            }
+        });
+
+        // Validate language pair (source and target should be different)
+        function validateLanguagePair() {
+            if (sourceLanguage.value === targetLanguage.value) {
+                alert('⚠️ Source and Target languages should be different!\nYou are doing interpretation, so you need to translate from one language to another.');
+                return false;
+            }
+            return true;
+        }
+
+        // Check language pair when changed
+        sourceLanguage.addEventListener('change', validateLanguagePair);
+        targetLanguage.addEventListener('change', validateLanguagePair);
+
+        // ============================================
+        // START RECORDING
+        // ============================================
+        startRecordBtn.addEventListener('click', async function() {
+            try {
+                // Validate language pair first (before asking for microphone)
+                if (!validateLanguagePair()) {
+                    return;
+                }
+
+                // Ask browser for permission to use microphone (only first time)
+                if (!audioStream) {
+                    console.log('🎤 Requesting microphone access...');
+                    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    console.log('✅ Microphone access granted!');
+                } else {
+                    console.log('✅ Using existing microphone stream');
+                }
+
+                // Create a MediaRecorder to record the audio stream
+                mediaRecorder = new MediaRecorder(audioStream);
+
+                // Clear previous audio data
+                audioChunks = [];
+
+                // This function runs whenever audio data is available
+                mediaRecorder.ondataavailable = function(event) {
+                    // Save each piece of audio data
+                    audioChunks.push(event.data);
+                    console.log('📦 Audio chunk saved');
+                };
+
+                // This function runs when recording stops
+                mediaRecorder.onstop = function() {
+                    console.log('🎵 Recording stopped, processing audio...');
+
+                    // Combine all audio chunks into one audio file
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+                    // Create a URL for the audio so we can play it later
+                    const audioUrl = URL.createObjectURL(audioBlob);
+
+                    // Create recording object (but don't save it yet - waiting for transcript!)
+                    pendingRecording = {
+                        id: Date.now(),  // Unique ID based on current time
+                        url: audioUrl,
+                        blob: audioBlob,
+                        timestamp: new Date().toLocaleString(),
+                        duration: 0,  // We'll calculate this later
+                        transcript: '',  // Will be filled when recognition ends
+                        sourceLanguage: sourceLanguage.value,  // Video language
+                        targetLanguage: targetLanguage.value,  // Interpretation language
+                        startVideoTime: recordingStartVideoTime  // Video time when recording started
+                    };
+
+                    console.log('⏳ Recording prepared, waiting for transcript to complete...');
+
+                    // Stop speech recognition (transcript will be saved in recognition.onend)
+                    if (recognition) {
+                        recognition.stop();
+                    }
+
+                    // Reset transcript (will be done after saving in recognition.onend)
+                    // currentTranscript = '';
+                    // finalTranscript = '';
+                };
+
+                // Start recording!
+                mediaRecorder.start();
+                recordingStartVideoTime = getCurrentVideoTime();  // Remember video time at recording start
+                console.log('🔴 Recording started at video time:', formatTime(Math.floor(recordingStartVideoTime)));
+
+                // Start speech recognition with TARGET language (interpretation language)
+                if (recognition) {
+                    const selectedLanguage = targetLanguage.value;
+                    recognition.lang = selectedLanguage;
+
+                    // Mark that we're starting a new recording session
+                    isRecording = true;
+
+                    recognition.start();
+                    console.log('🎤 Speech recognition started');
+                    console.log('   Source (Video):', sourceLanguage.value);
+                    console.log('   Target (You):', selectedLanguage);
+                }
+
+                // Update UI
+                startRecordBtn.disabled = true;
+                stopRecordBtn.disabled = false;
+                recordingIndicator.classList.add('active');
+
+            } catch (error) {
+                // If something goes wrong (user denies permission, no microphone, etc.)
+                console.error('❌ Error accessing microphone:', error);
+                alert('Could not access microphone. Please check your permissions.');
+            }
+        });
+
+        // ============================================
+        // STOP RECORDING
+        // ============================================
+        stopRecordBtn.addEventListener('click', function() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                // Stop the recording
+                mediaRecorder.stop();
+
+                // Note: We keep the audioStream active for next recording
+                // (no need to ask for permission again)
+
+                console.log('⏹️ Recording stopped by user');
+
+                // Update UI
+                startRecordBtn.disabled = false;
+                stopRecordBtn.disabled = true;
+                recordingIndicator.classList.remove('active');
+            }
+        });
+
+        // ============================================
+        // DISPLAY RECORDING IN TIMELINE
+        // ============================================
+
+        // Colors for different transcript segments
+        const segmentColors = [
+            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7',
+            '#74b9ff', '#a29bfe', '#fd79a8', '#fdcb6e', '#e17055'
+        ];
+
+        function displayRecordingInTimeline(recording) {
+            console.log('📊 Displaying recording in timeline:', recording);
+
+            // Check if we have segments to display
+            if (!recording.segments || recording.segments.length === 0) {
+                console.log('⚠️ No segments found, showing simple clip');
+                displaySimpleClip(recording);
+                return;
+            }
+
+            // Display each transcript segment as a separate colored clip
+            recording.segments.forEach((segment, index) => {
+                // Calculate start and end time
+                const startTime = segment.time;
+                const endTime = index < recording.segments.length - 1
+                    ? recording.segments[index + 1].time  // Next segment's start time
+                    : segment.time + 3;  // Or default 3 seconds for last segment
+
+                const duration = endTime - startTime;
+
+                // Calculate position and width on timeline
+                const startPosition = startTime * PIXELS_PER_SECOND;
+                const clipWidth = Math.max(duration * PIXELS_PER_SECOND, 50);  // Minimum 50px
+
+                // Create segment clip
+                const segmentClip = document.createElement('div');
+                segmentClip.className = 'transcript-segment';
+                segmentClip.style.left = startPosition + 'px';
+                segmentClip.style.width = clipWidth + 'px';
+
+                // Assign color (cycle through colors)
+                const color = segmentColors[index % segmentColors.length];
+                segmentClip.style.backgroundColor = color;
+
+                // Set content (show time range)
+                const startTimeStr = formatTime(Math.floor(startTime));
+                const endTimeStr = formatTime(Math.floor(endTime));
+                segmentClip.textContent = `${startTimeStr}~${endTimeStr}`;
+                segmentClip.title = segment.text;  // Show full text on hover
+
+                // Store segment data
+                segmentClip.dataset.segmentIndex = index;
+                segmentClip.dataset.startTime = startTime;
+                segmentClip.dataset.endTime = endTime;
+                segmentClip.dataset.text = segment.text;
+
+                // Click event: Show text + seek video (NO audio - just review)
+                segmentClip.addEventListener('click', function() {
+                    // Stop any currently playing audio first
+                    if (currentlyPlayingAudio) {
+                        currentlyPlayingAudio.pause();
+                        currentlyPlayingAudio = null;
+                        document.querySelectorAll('.transcript-segment.playing').forEach(el => {
+                            el.classList.remove('playing');
+                        });
+                    }
+
+                    // Show the transcript text
+                    const timeRange = `[${startTimeStr}~${endTimeStr}]`;
+                    subtitleText.innerHTML = `<strong>${timeRange}</strong><br><br>${segment.text}<br><br><span style="font-size:12px;color:#aaa;">Double-click to hear your recording</span>`;
+                    subtitleOverlay.classList.add('active');
+
+                    // Seek the VIDEO to this segment's time (so user sees what they were interpreting)
+                    if (isYouTubeActive && ytPlayer && ytPlayer.seekTo) {
+                        ytPlayer.seekTo(segment.time, true);
+                        ytPlayer.pauseVideo();  // Pause so user can review
+                    } else if (mainVideo) {
+                        mainVideo.currentTime = segment.time;
+                        mainVideo.pause();  // Pause so user can review
+                    }
+
+                    // Highlight the clicked segment
+                    document.querySelectorAll('.transcript-segment.selected').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    segmentClip.classList.add('selected');
+
+                    // Hide subtitle after 5 seconds
+                    setTimeout(function() {
+                        subtitleOverlay.classList.remove('active');
+                    }, 5000);
+
+                    console.log(`🎬 Video seeked to ${startTimeStr} | Text: ${segment.text}`);
+                });
+
+                // Double-click: Play the FULL recording audio from the beginning
+                segmentClip.addEventListener('dblclick', function(e) {
+                    e.stopPropagation();
+
+                    // Stop any currently playing audio
+                    if (currentlyPlayingAudio) {
+                        currentlyPlayingAudio.pause();
+                        currentlyPlayingAudio = null;
+                        document.querySelectorAll('.transcript-segment.playing').forEach(el => {
+                            el.classList.remove('playing');
+                        });
+                    }
+
+                    // Play full recording from the beginning
+                    const audio = new Audio(recording.url);
+                    audio.play();
+                    currentlyPlayingAudio = audio;
+
+                    // Add visual feedback
+                    segmentClip.classList.add('playing');
+
+                    // Show full transcript with all segments
+                    let fullText = '';
+                    recording.segments.forEach(seg => {
+                        const t = formatTime(Math.floor(seg.time));
+                        fullText += `[${t}] ${seg.text}<br>`;
+                    });
+                    subtitleText.innerHTML = `<strong>Full Recording</strong><br><br>${fullText}`;
+                    subtitleOverlay.classList.add('active');
+
+                    audio.addEventListener('ended', function() {
+                        currentlyPlayingAudio = null;
+                        segmentClip.classList.remove('playing');
+                        setTimeout(() => subtitleOverlay.classList.remove('active'), 2000);
+                    });
+
+                    console.log(`🔊 Playing FULL recording from beginning`);
+                });
+
+                // Add to timeline
+                recordingsTrack.appendChild(segmentClip);
+            });
+
+            console.log(`✅ Added ${recording.segments.length} segment clips to timeline`);
+        }
+
+        // Fallback: Display simple clip if no segments
+        function displaySimpleClip(recording) {
+            const startTime = getCurrentVideoTime();
+            recording.startTime = startTime;
+
+            const audio = new Audio(recording.url);
+            audio.addEventListener('loadedmetadata', function() {
+                recording.duration = audio.duration;
+
+                const startPosition = startTime * PIXELS_PER_SECOND;
+                const clipWidth = recording.duration * PIXELS_PER_SECOND;
+
+                const clip = document.createElement('div');
+                clip.className = 'recording-clip';
+                clip.style.left = startPosition + 'px';
+                clip.style.width = clipWidth + 'px';
+                clip.dataset.recordingId = recording.id;
+
+                clip.innerHTML = `
+                    <div class="clip-content">
+                        🎙️ Recording ${recordedAudios.length}
+                    </div>
+                `;
+
+                if (recording.transcript) {
+                    clip.title = recording.transcript;
+                }
+
+                // Click to play the full recording
+                clip.addEventListener('click', function() {
+                    if (currentlyPlayingAudio) {
+                        currentlyPlayingAudio.pause();
+                        currentlyPlayingAudio = null;
+                    }
+
+                    const playAudio = new Audio(recording.url);
+                    playAudio.play();
+                    currentlyPlayingAudio = playAudio;
+
+                    // Show transcript if available
+                    if (recording.transcript) {
+                        subtitleText.textContent = recording.transcript;
+                        subtitleOverlay.classList.add('active');
+                    }
+
+                    playAudio.addEventListener('ended', function() {
+                        currentlyPlayingAudio = null;
+                        setTimeout(() => subtitleOverlay.classList.remove('active'), 2000);
+                    });
+
+                    console.log('🔊 Playing simple recording');
+                });
+
+                recordingsTrack.appendChild(clip);
+                console.log('✅ Simple recording clip added');
+            });
+        }
+
+        // ============================================
+        // MAKE CLIP INTERACTIVE (DRAG & TRIM)
+        // ============================================
+        function makeClipInteractive(clip, recording) {
+            let isDragging = false;
+            let isTrimmingLeft = false;
+            let isTrimmingRight = false;
+            let startX = 0;
+            let startLeft = 0;
+            let startWidth = 0;
+
+            // Get handles
+            const leftHandle = clip.querySelector('.clip-handle-left');
+            const rightHandle = clip.querySelector('.clip-handle-right');
+            const content = clip.querySelector('.clip-content');
+
+            // ============================================
+            // DRAG TO MOVE CLIP
+            // ============================================
+            content.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startX = e.clientX;
+                startLeft = parseInt(clip.style.left);
+                document.body.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+
+            // ============================================
+            // TRIM LEFT EDGE
+            // ============================================
+            leftHandle.addEventListener('mousedown', function(e) {
+                isTrimmingLeft = true;
+                startX = e.clientX;
+                startLeft = parseInt(clip.style.left);
+                startWidth = parseInt(clip.style.width);
+                e.stopPropagation();
+                e.preventDefault();
+            });
+
+            // ============================================
+            // TRIM RIGHT EDGE
+            // ============================================
+            rightHandle.addEventListener('mousedown', function(e) {
+                isTrimmingRight = true;
+                startX = e.clientX;
+                startWidth = parseInt(clip.style.width);
+                e.stopPropagation();
+                e.preventDefault();
+            });
+
+            // ============================================
+            // MOUSE MOVE (while dragging or trimming)
+            // ============================================
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    // Calculate new position
+                    const deltaX = e.clientX - startX;
+                    const newLeft = Math.max(0, startLeft + deltaX);
+                    clip.style.left = newLeft + 'px';
+
+                    // Update recording start time
+                    recording.startTime = newLeft / PIXELS_PER_SECOND;
+                }
+                else if (isTrimmingLeft) {
+                    // Trim from left
+                    const deltaX = e.clientX - startX;
+                    const newLeft = Math.max(0, startLeft + deltaX);
+                    const newWidth = Math.max(20, startWidth - deltaX);
+
+                    clip.style.left = newLeft + 'px';
+                    clip.style.width = newWidth + 'px';
+
+                    // Update recording
+                    recording.startTime = newLeft / PIXELS_PER_SECOND;
+                    recording.trimStart = deltaX / PIXELS_PER_SECOND;
+                }
+                else if (isTrimmingRight) {
+                    // Trim from right
+                    const deltaX = e.clientX - startX;
+                    const newWidth = Math.max(20, startWidth + deltaX);
+
+                    clip.style.width = newWidth + 'px';
+
+                    // Update recording
+                    recording.trimEnd = (startWidth - newWidth) / PIXELS_PER_SECOND;
+                }
+            });
+
+            // ============================================
+            // MOUSE UP (stop dragging/trimming)
+            // ============================================
+            document.addEventListener('mouseup', function() {
+                if (isDragging || isTrimmingLeft || isTrimmingRight) {
+                    console.log('✅ Clip updated:', recording);
+                }
+                isDragging = false;
+                isTrimmingLeft = false;
+                isTrimmingRight = false;
+                document.body.style.cursor = 'default';
+            });
+
+            // Double-click to play recording and show transcript
+            content.addEventListener('dblclick', function() {
+                const audio = new Audio(recording.url);
+                audio.play();
+                console.log('▶️ Playing recording');
+
+                // Show transcript if available
+                if (recording.transcript && recording.transcript.length > 0) {
+                    subtitleText.textContent = recording.transcript;
+                    subtitleOverlay.classList.add('active');
+
+                    // Hide after audio finishes
+                    audio.addEventListener('ended', function() {
+                        setTimeout(function() {
+                            subtitleOverlay.classList.remove('active');
+                        }, 2000);
+                    });
+                }
+            });
+
+            // Single click to show transcript with timestamps
+            content.addEventListener('click', function() {
+                if (recording.segments && recording.segments.length > 0) {
+                    // Format transcript with timestamps
+                    let formattedTranscript = '📝 Transcript with Timestamps:\n\n';
+
+                    recording.segments.forEach(segment => {
+                        const timeStr = formatTime(Math.floor(segment.time));
+                        formattedTranscript += `[${timeStr}] ${segment.text}\n\n`;
+                    });
+
+                    alert(formattedTranscript);
+                } else if (recording.transcript && recording.transcript.length > 0) {
+                    // Fallback to plain transcript if no segments
+                    alert('📝 Transcript:\n\n' + recording.transcript);
+                }
+            });
+        }
+        // ============================================
+        // SPEED CONTROL
+        // ============================================
+        const speedBtns = document.querySelectorAll('.speed-btn');
+
+        speedBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const speed = parseFloat(btn.dataset.speed);
+
+                // Apply speed to the active video
+                if (isYouTubeActive && ytPlayer && ytPlayer.setPlaybackRate) {
+                    ytPlayer.setPlaybackRate(speed);
+                } else if (mainVideo) {
+                    mainVideo.playbackRate = speed;
+                }
+
+                // Update button styles: remove 'active' from all, add to clicked one
+                speedBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                console.log(`⚡ Playback speed: ${speed}x`);
+            });
+        });
+
+        // ============================================
+        // EXPORT RECORDINGS
+        // ============================================
+        exportBtn.addEventListener('click', function() {
+            if (recordedAudios.length === 0) {
+                alert('No recordings to export!');
+                return;
+            }
+
+            // 1) Export transcript as .txt file
+            let transcriptContent = '=== Interpretation Practice Transcript ===\n';
+            transcriptContent += 'Date: ' + new Date().toLocaleString() + '\n\n';
+
+            recordedAudios.forEach(function(recording, index) {
+                transcriptContent += '--- Recording ' + (index + 1) + ' ---\n';
+                transcriptContent += 'Source: ' + recording.sourceLanguage + '\n';
+                transcriptContent += 'Target: ' + recording.targetLanguage + '\n\n';
+
+                if (recording.segments && recording.segments.length > 0) {
+                    recording.segments.forEach(function(seg) {
+                        const timeStr = formatTime(Math.floor(seg.time));
+                        transcriptContent += '[' + timeStr + '] ' + seg.text + '\n';
+                    });
+                } else if (recording.transcript) {
+                    transcriptContent += recording.transcript + '\n';
+                } else {
+                    transcriptContent += '(No transcript available)\n';
+                }
+
+                transcriptContent += '\n';
+            });
+
+            // Create and download the text file
+            const textBlob = new Blob([transcriptContent], { type: 'text/plain' });
+            const textUrl = URL.createObjectURL(textBlob);
+            const textLink = document.createElement('a');
+            textLink.href = textUrl;
+            textLink.download = 'interpretation_transcript_' + Date.now() + '.txt';
+            textLink.click();
+            URL.revokeObjectURL(textUrl);
+
+            // 2) Export each audio recording as .webm file
+            recordedAudios.forEach(function(recording, index) {
+                const audioLink = document.createElement('a');
+                audioLink.href = recording.url;
+                audioLink.download = 'recording_' + (index + 1) + '_' + Date.now() + '.webm';
+                audioLink.click();
+            });
+
+            console.log('💾 Exported ' + recordedAudios.length + ' recording(s) + transcript');
+        });
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', function(e) {
+            // Don't trigger shortcuts when typing in the URL input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            switch (e.code) {
+                // SPACE: Toggle recording (start/stop)
+                case 'Space':
+                    e.preventDefault();  // Prevent page scroll
+
+                    if (startRecordBtn.disabled === false) {
+                        // Not recording → start
+                        startRecordBtn.click();
+                    } else if (stopRecordBtn.disabled === false) {
+                        // Recording → stop
+                        stopRecordBtn.click();
+                    }
+                    break;
+
+                // ESC: Stop audio playback + hide subtitle
+                case 'Escape':
+                    if (currentlyPlayingAudio) {
+                        currentlyPlayingAudio.pause();
+                        currentlyPlayingAudio = null;
+                        document.querySelectorAll('.transcript-segment.playing').forEach(el => {
+                            el.classList.remove('playing');
+                        });
+                    }
+                    subtitleOverlay.classList.remove('active');
+                    break;
+
+                // LEFT/RIGHT: Skip video 5 seconds
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    skipVideo(-5);
+                    break;
+
+                case 'ArrowRight':
+                    e.preventDefault();
+                    skipVideo(5);
+                    break;
+            }
+        });
+
+        // Helper: Skip video forward or backward by seconds
+        function skipVideo(seconds) {
+            if (isYouTubeActive && ytPlayer && ytPlayer.seekTo) {
+                const currentTime = ytPlayer.getCurrentTime();
+                ytPlayer.seekTo(currentTime + seconds, true);
+                console.log(`⏩ Skipped ${seconds > 0 ? 'forward' : 'backward'} ${Math.abs(seconds)}s`);
+            } else if (mainVideo) {
+                mainVideo.currentTime += seconds;
+                console.log(`⏩ Skipped ${seconds > 0 ? 'forward' : 'backward'} ${Math.abs(seconds)}s`);
+            }
+        }
+
+        console.log('⌨️ Keyboard shortcuts ready:');
+        console.log('   SPACE = Start/Stop recording');
+        console.log('   ESC = Stop playback');
+        console.log('   ←/→ = Skip video 5 seconds');
+    </script>
+</body>
+</html>

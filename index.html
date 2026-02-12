@@ -141,6 +141,15 @@
             background-color: #cc0000;
         }
 
+        .record-btn.pause {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .record-btn.pause:hover {
+            background-color: #e68a00;
+        }
+
         .record-btn.stop {
             background-color: #444;
             color: white;
@@ -212,7 +221,24 @@
             flex: 1; /* Takes 1/3 of screen */
             background-color: #2c2c2c;
             padding: 20px;
-            overflow-x: auto; /* Horizontal scroll enabled */
+            overflow-x: scroll; /* Always show horizontal scrollbar */
+        }
+
+        /* Custom scrollbar styling for timeline */
+        .timeline-section::-webkit-scrollbar {
+            height: 12px;
+        }
+        .timeline-section::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 6px;
+        }
+        .timeline-section::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 6px;
+            border: 2px solid #1a1a1a;
+        }
+        .timeline-section::-webkit-scrollbar-thumb:hover {
+            background: #888;
         }
 
         .timeline {
@@ -346,6 +372,35 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
             border-color: rgba(255, 255, 255, 0.6);
             z-index: 10;
+        }
+
+        /* Delete button on segments (hidden by default, shows on hover) */
+        .segment-delete-btn {
+            display: none;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 18px;
+            height: 18px;
+            background-color: #ff4444;
+            color: white;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            font-size: 10px;
+            line-height: 14px;
+            text-align: center;
+            cursor: pointer;
+            z-index: 20;
+            font-weight: bold;
+        }
+
+        .segment-delete-btn:hover {
+            background-color: #cc0000;
+            transform: scale(1.2);
+        }
+
+        .transcript-segment:hover .segment-delete-btn {
+            display: block;
         }
 
         /* Selected state: when user clicks a segment to review */
@@ -542,9 +597,200 @@
             line-height: 1.5;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
+
+        /* Shortcuts help button */
+        .shortcuts-help-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background-color: #555;
+            color: #fff;
+            border: 2px solid #888;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .shortcuts-help-btn:hover {
+            background-color: #ff4444;
+            color: white;
+            border-color: #ff4444;
+        }
+
+        /* Shortcuts modal overlay */
+        .shortcuts-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shortcuts-modal.active {
+            display: flex;
+        }
+
+        .shortcuts-modal-content {
+            background-color: #2c2c2c;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .shortcuts-modal-content h2 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .shortcut-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
+        }
+
+        .shortcut-row:last-child {
+            border-bottom: none;
+        }
+
+        .shortcut-key {
+            background-color: #444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #666;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .shortcut-desc {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .shortcuts-close-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 8px 24px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .shortcuts-close-btn:hover {
+            background-color: #666;
+        }
+
+        /* Mic setup banner */
+        .mic-setup-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ff9800;
+            color: #000;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 400;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .mic-setup-banner.hidden {
+            display: none;
+        }
+
+        .mic-setup-banner button {
+            padding: 8px 20px;
+            background-color: #fff;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .mic-setup-banner button:hover {
+            background-color: #eee;
+        }
+
+        .mic-ready-indicator {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        /* Audio waveform visualizer */
+        .audio-visualizer-container {
+            width: 100%;
+            background-color: #111;
+            border-top: 1px solid #333;
+            position: relative;
+        }
+
+        .audio-visualizer-container canvas {
+            display: block;
+            width: 100%;
+            height: 60px;
+        }
+
+        .visualizer-label {
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            font-size: 11px;
+            color: #666;
+            z-index: 5;
+        }
+
+        .visualizer-unavailable {
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 13px;
+            background-color: #111;
+            border-top: 1px solid #333;
+        }
     </style>
 </head>
 <body>
+    <!-- Mic setup banner (shown until user grants permission) -->
+    <div class="mic-setup-banner" id="mic-setup-banner">
+        🎙️ 녹음을 사용하려면 마이크를 먼저 허용해주세요
+        <button id="mic-setup-btn">마이크 허용하기</button>
+    </div>
+
     <!-- Top section: Video area -->
     <div class="video-section">
         <!-- Video upload controls -->
@@ -554,6 +800,8 @@
             <input type="text" id="youtube-url-input" placeholder="Or paste YouTube URL..." class="youtube-input">
             <button id="load-youtube-btn" class="youtube-btn">Load YouTube</button>
             <button id="change-video-btn" class="change-video-btn" style="display: none;">🔄 Change Video</button>
+            <label for="subtitle-file-input" class="upload-btn" style="background-color: #2196f3;">📖 자막 업로드 (.srt/.vtt)</label>
+            <input type="file" id="subtitle-file-input" accept=".srt,.vtt" style="display: none;">
         </div>
 
         <!-- Recording controls -->
@@ -563,6 +811,7 @@
                 <span>Recording...</span>
             </div>
             <button class="record-btn start" id="start-record-btn">🎙️ Start Recording</button>
+            <button class="record-btn pause" id="pause-record-btn" disabled>⏸️ Pause</button>
             <button class="record-btn stop" id="stop-record-btn" disabled>⏹️ Stop Recording</button>
 
             <!-- Language selectors -->
@@ -619,6 +868,12 @@
         </div>
     </div>
 
+    <!-- Audio Waveform Visualizer -->
+    <div class="audio-visualizer-container" id="visualizer-container">
+        <span class="visualizer-label">Audio Waveform</span>
+        <canvas id="audio-visualizer"></canvas>
+    </div>
+
     <!-- Bottom section: Timeline area -->
     <div class="timeline-section">
         <div class="timeline">
@@ -626,6 +881,7 @@
                 <h3>Timeline</h3>
                 <div class="shortcut-hints">
                     <span>SPACE: Record</span>
+                    <span>K: Play/Pause</span>
                     <span>ESC: Stop</span>
                     <span>←→: Skip 5s</span>
                 </div>
@@ -644,6 +900,14 @@
                 </div>
             </div>
 
+            <!-- Source language track (video's original speech) -->
+            <div class="timeline-track">
+                <div class="track-label">Source</div>
+                <div class="track-content" id="source-track">
+                    <!-- Source language segments will appear here -->
+                </div>
+            </div>
+
             <!-- Audio tracks (recordings) -->
             <div class="timeline-track">
                 <div class="track-label">Recordings</div>
@@ -651,6 +915,37 @@
                     <!-- Recording clips will appear here -->
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Keyboard shortcuts help button -->
+    <button class="shortcuts-help-btn" id="shortcuts-help-btn" title="키보드 단축키 보기">?</button>
+
+    <!-- Keyboard shortcuts modal -->
+    <div class="shortcuts-modal" id="shortcuts-modal">
+        <div class="shortcuts-modal-content">
+            <h2>⌨️ 키보드 단축키</h2>
+            <div class="shortcut-row">
+                <span class="shortcut-key">SPACE</span>
+                <span class="shortcut-desc">녹음 시작 / 중지</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-key">K</span>
+                <span class="shortcut-desc">비디오 재생 / 일시정지</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-key">ESC</span>
+                <span class="shortcut-desc">재생 중지</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-key">←</span>
+                <span class="shortcut-desc">5초 뒤로</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-key">→</span>
+                <span class="shortcut-desc">5초 앞으로</span>
+            </div>
+            <button class="shortcuts-close-btn" id="shortcuts-close-btn">닫기</button>
         </div>
     </div>
 
@@ -685,14 +980,30 @@
 
         // Recording elements
         const startRecordBtn = document.getElementById('start-record-btn');
+        const pauseRecordBtn = document.getElementById('pause-record-btn');
         const stopRecordBtn = document.getElementById('stop-record-btn');
         const recordingIndicator = document.getElementById('recording-indicator');
 
         // Timeline elements
         const timelineRuler = document.getElementById('timeline-ruler');
         const videoTrack = document.getElementById('video-track');
+        const sourceTrack = document.getElementById('source-track');
         const recordingsTrack = document.getElementById('recordings-track');
         const playhead = document.getElementById('playhead');
+
+        // Audio visualizer elements
+        const visualizerCanvas = document.getElementById('audio-visualizer');
+        const visualizerCtx = visualizerCanvas.getContext('2d');
+        const visualizerContainer = document.getElementById('visualizer-container');
+
+        // Audio visualizer state
+        let audioContext = null;
+        let analyser = null;
+        let audioSourceNode = null;
+        let visualizerActive = false;
+
+        // Source subtitle state
+        let sourceSegments = [];
 
         // ============================================
         // TIMELINE FUNCTIONALITY
@@ -708,6 +1019,7 @@
             const totalWidth = TIMELINE_DURATION * PIXELS_PER_SECOND;
             timelineRuler.style.width = totalWidth + 'px';
             videoTrack.style.width = totalWidth + 'px';
+            sourceTrack.style.width = totalWidth + 'px';
             recordingsTrack.style.width = totalWidth + 'px';
 
             // Clear existing markers
@@ -779,6 +1091,12 @@
             requestAnimationFrame(updatePlayhead);
         }
 
+        // Mouse wheel → horizontal scroll on timeline
+        document.querySelector('.timeline-section').addEventListener('wheel', function(e) {
+            e.preventDefault();
+            this.scrollLeft += e.deltaY;
+        }, { passive: false });
+
         // Function to get current video time (works for both YouTube and regular video)
         function getCurrentVideoTime() {
             if (isYouTubeActive && ytPlayer && ytPlayer.getCurrentTime) {
@@ -820,6 +1138,9 @@
                 mainVideo.style.display = 'block';
                 youtubeContainer.style.display = 'none';
                 isYouTubeActive = false;  // Using regular video now
+
+                // Restore audio visualizer canvas
+                visualizerContainer.innerHTML = '<span class="visualizer-label">Audio Waveform</span><canvas id="audio-visualizer"></canvas>';
 
                 // Stop YouTube player if it's playing
                 if (ytPlayer && ytPlayer.pauseVideo) {
@@ -890,6 +1211,23 @@
             console.log('🔄 Ready to load a new video!');
         });
 
+        // When local video starts playing
+        mainVideo.addEventListener('play', function() {
+            // Setup audio visualizer on first play
+            if (!audioContext) {
+                setupAudioVisualizer();
+            }
+            // Resume audio context if suspended (browser policy)
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            // Auto-start recording (only if mic is already ready)
+            if (!isRecording && !startRecordBtn.disabled && isMicReady()) {
+                console.log('🎬 Video playing → auto-start recording');
+                startRecordBtn.click();
+            }
+        });
+
         // Function to load YouTube video using IFrame API
         function loadYouTubeVideo(videoId) {
             // Check if running from file:// protocol (YouTube blocks this)
@@ -910,6 +1248,9 @@
             mainVideo.style.display = 'none';
             youtubeContainer.style.display = 'block';
             isYouTubeActive = true;
+
+            // YouTube doesn't support audio waveform (CORS restriction)
+            visualizerContainer.innerHTML = '<div class="visualizer-unavailable">🎵 YouTube 영상은 오디오 파형 표시가 불가합니다</div>';
 
             // Destroy existing player if any
             if (ytPlayer && ytPlayer.destroy) {
@@ -951,6 +1292,12 @@
             // YT.PlayerState.PAUSED = 2
             // YT.PlayerState.ENDED = 0
             console.log('▶️ YouTube Player state:', event.data);
+
+            // When YouTube starts playing: auto-start recording
+            if (event.data === 1 && !isRecording && !startRecordBtn.disabled && isMicReady()) {
+                console.log('🎬 YouTube playing → auto-start recording');
+                startRecordBtn.click();
+            }
         }
 
         // YouTube Player error event
@@ -1017,11 +1364,59 @@
         // Currently playing audio (so we can stop it when clicking another segment)
         let currentlyPlayingAudio = null;
 
+        // Track interim transcript (needs to be in outer scope for timers to access)
+        let lastInterimTranscript = '';
+        let lastInterimTime = 0;
+        let speechStartTime = -1;  // When the user STARTED speaking (first interim result)
+
+        // Silence detection: auto-stop recording after 20 seconds of no speech
+        const SILENCE_TIMEOUT = 20000;
+        let silenceTimer = null;
+
+        // Periodic save: save interim text every 5 seconds to prevent data loss
+        let interimSaveInterval = null;
+
         // Get language and subtitle elements
         const sourceLanguage = document.getElementById('source-language');
         const targetLanguage = document.getElementById('target-language');
         const subtitleOverlay = document.getElementById('subtitle-overlay');
         const subtitleText = document.getElementById('subtitle-text');
+
+        // Mic setup banner elements
+        const micSetupBanner = document.getElementById('mic-setup-banner');
+        const micSetupBtn = document.getElementById('mic-setup-btn');
+
+        // Helper: Check if mic stream is alive (without requesting)
+        function isMicReady() {
+            if (!audioStream || !audioStream.active) return false;
+            const tracks = audioStream.getAudioTracks();
+            return tracks.length > 0 && tracks[0].readyState === 'live';
+        }
+
+        // Helper: Request microphone access (called during user gestures like button clicks)
+        async function ensureMicAccess() {
+            if (isMicReady()) return true;
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('✅ Microphone access granted!');
+                micSetupBanner.classList.add('hidden');
+                return true;
+            } catch (error) {
+                console.log('ℹ️ Microphone access denied or unavailable');
+                return false;
+            }
+        }
+
+        // Mic setup button: user clicks once → mic granted → banner disappears
+        micSetupBtn.addEventListener('click', async function() {
+            const granted = await ensureMicAccess();
+            if (granted) {
+                micSetupBanner.classList.add('hidden');
+                console.log('🎙️ Mic ready! Auto-recording will work now.');
+            } else {
+                alert('마이크가 차단되었습니다. 브라우저 주소창 옆의 자물쇠 아이콘에서 마이크를 허용해주세요.');
+            }
+        });
 
         // ============================================
         // SPEECH RECOGNITION SETUP
@@ -1039,9 +1434,17 @@
             recognition.maxAlternatives = 1;  // Only get best result
             recognition.lang = targetLanguage.value;  // Set to TARGET language (interpretation language)
 
-            // Track the latest interim text so we can save it when recording stops
-            let lastInterimTranscript = '';
-            let lastInterimTime = 0;
+            // Helper: Get a segment time that doesn't overlap with previous segments
+            function getNextSegmentTime() {
+                let time = getCurrentVideoTime();
+                if (transcriptSegments.length > 0) {
+                    const lastTime = transcriptSegments[transcriptSegments.length - 1].time;
+                    if (time <= lastTime) {
+                        time = lastTime + 1;  // At least 1 second apart
+                    }
+                }
+                return time;
+            }
 
             // Event: When speech is recognized
             recognition.onresult = function(event) {
@@ -1053,21 +1456,38 @@
 
                     if (event.results[i].isFinal) {
                         // This result is final (user paused speaking)
-                        // Save with timestamp!
-                        const currentTime = getCurrentVideoTime();
+                        // Use the time when user STARTED speaking, not when result arrived
+                        let segTime;
+                        if (speechStartTime >= 0) {
+                            segTime = speechStartTime;
+                            // Ensure no overlap with previous segments
+                            if (transcriptSegments.length > 0) {
+                                const lastTime = transcriptSegments[transcriptSegments.length - 1].time;
+                                if (segTime <= lastTime) segTime = lastTime + 1;
+                            }
+                        } else {
+                            segTime = getNextSegmentTime();
+                        }
 
-                        transcriptSegments.push({
-                            time: currentTime,
-                            text: transcript.trim()
-                        });
+                        // Check if last segment was a periodic interim save that matches
+                        const lastSeg = transcriptSegments[transcriptSegments.length - 1];
+                        if (lastSeg && lastSeg._interim && transcript.trim().includes(lastSeg.text)) {
+                            // Update the interim save with final text (avoid duplicate)
+                            lastSeg.text = transcript.trim();
+                            lastSeg.time = segTime;
+                            delete lastSeg._interim;
+                        } else {
+                            transcriptSegments.push({
+                                time: segTime,
+                                text: transcript.trim()
+                            });
+                        }
 
-                        // Also add to finalTranscript for display
                         finalTranscript += transcript + ' ';
-
-                        // Clear interim since it's now final
                         lastInterimTranscript = '';
+                        speechStartTime = -1;  // Reset for next utterance
 
-                        console.log(`✅ [${formatTime(Math.floor(currentTime))}] ${transcript}`);
+                        console.log(`✅ [${formatTime(Math.floor(segTime))}] ${transcript}`);
                     } else {
                         // This result is interim (still speaking)
                         interimTranscript += transcript;
@@ -1078,6 +1498,11 @@
                 if (interimTranscript.trim()) {
                     lastInterimTranscript = interimTranscript.trim();
                     lastInterimTime = getCurrentVideoTime();
+
+                    // Record when user STARTED speaking (first interim for this utterance)
+                    if (speechStartTime < 0) {
+                        speechStartTime = getCurrentVideoTime();
+                    }
                 }
 
                 // Combine final and interim
@@ -1089,7 +1514,16 @@
                     subtitleOverlay.classList.add('active');
                 }
 
-                console.log('📝 Current transcription:', currentTranscript);
+                // Reset silence timer (speech was detected!)
+                if (isRecording && silenceTimer) {
+                    clearTimeout(silenceTimer);
+                    silenceTimer = setTimeout(function() {
+                        if (isRecording) {
+                            console.log('⏱️ 20초 무음 감지, 자동 녹음 중지...');
+                            stopRecordBtn.click();
+                        }
+                    }, SILENCE_TIMEOUT);
+                }
             };
 
             // Event: When recognition starts
@@ -1122,7 +1556,7 @@
                     if (lastInterimTranscript) {
                         console.log('📝 Saving interim text before auto-restart:', lastInterimTranscript);
                         transcriptSegments.push({
-                            time: lastInterimTime,
+                            time: getNextSegmentTime(),
                             text: lastInterimTranscript
                         });
                         finalTranscript += lastInterimTranscript + ' ';
@@ -1146,7 +1580,7 @@
                     if (lastInterimTranscript) {
                         console.log('📝 Saving remaining interim text:', lastInterimTranscript);
                         transcriptSegments.push({
-                            time: lastInterimTime,
+                            time: getNextSegmentTime(),
                             text: lastInterimTranscript
                         });
                         finalTranscript += lastInterimTranscript + ' ';
@@ -1229,13 +1663,11 @@
                     return;
                 }
 
-                // Ask browser for permission to use microphone (only first time)
-                if (!audioStream) {
-                    console.log('🎤 Requesting microphone access...');
-                    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    console.log('✅ Microphone access granted!');
-                } else {
-                    console.log('✅ Using existing microphone stream');
+                // Ensure microphone stream is available
+                const micReady = await ensureMicAccess();
+                if (!micReady) {
+                    alert('마이크 접근이 필요합니다. 브라우저 설정에서 마이크를 허용해주세요.');
+                    return;
                 }
 
                 // Create a MediaRecorder to record the audio stream
@@ -1305,8 +1737,37 @@
                     console.log('   Target (You):', selectedLanguage);
                 }
 
+                // Start silence detection timer (auto-stop after 20s of no speech)
+                silenceTimer = setTimeout(function() {
+                    if (isRecording) {
+                        console.log('⏱️ 20초 무음 감지, 자동 녹음 중지...');
+                        stopRecordBtn.click();
+                    }
+                }, SILENCE_TIMEOUT);
+
+                // Start periodic interim text saving (every 5 seconds)
+                interimSaveInterval = setInterval(function() {
+                    if (lastInterimTranscript && isRecording) {
+                        let saveTime = getCurrentVideoTime();
+                        if (transcriptSegments.length > 0) {
+                            const lastTime = transcriptSegments[transcriptSegments.length - 1].time;
+                            if (saveTime <= lastTime) saveTime = lastTime + 1;
+                        }
+                        transcriptSegments.push({
+                            time: saveTime,
+                            text: lastInterimTranscript,
+                            _interim: true
+                        });
+                        finalTranscript += lastInterimTranscript + ' ';
+                        lastInterimTranscript = '';
+                        console.log('⏰ Periodic save: interim text saved');
+                    }
+                }, 5000);
+
                 // Update UI
                 startRecordBtn.disabled = true;
+                pauseRecordBtn.disabled = false;
+                pauseRecordBtn.textContent = '⏸️ Pause';
                 stopRecordBtn.disabled = false;
                 recordingIndicator.classList.add('active');
 
@@ -1325,15 +1786,94 @@
                 // Stop the recording
                 mediaRecorder.stop();
 
+                // Clear silence and periodic save timers
+                if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+                if (interimSaveInterval) { clearInterval(interimSaveInterval); interimSaveInterval = null; }
+
                 // Note: We keep the audioStream active for next recording
                 // (no need to ask for permission again)
 
                 console.log('⏹️ Recording stopped by user');
 
+                // Rewind video to the beginning
+                if (isYouTubeActive && ytPlayer && ytPlayer.seekTo) {
+                    ytPlayer.seekTo(0, true);
+                    ytPlayer.pauseVideo();
+                } else if (mainVideo) {
+                    mainVideo.currentTime = 0;
+                    mainVideo.pause();
+                }
+                console.log('⏪ Video rewound to beginning');
+
                 // Update UI
                 startRecordBtn.disabled = false;
+                pauseRecordBtn.disabled = true;
+                pauseRecordBtn.textContent = '⏸️ Pause';
                 stopRecordBtn.disabled = true;
                 recordingIndicator.classList.remove('active');
+            }
+        });
+
+        // ============================================
+        // PAUSE / RESUME RECORDING
+        // ============================================
+        pauseRecordBtn.addEventListener('click', function() {
+            if (!mediaRecorder) return;
+
+            if (mediaRecorder.state === 'recording') {
+                // Pause recording
+                mediaRecorder.pause();
+                if (recognition) recognition.stop();
+
+                // Pause video too
+                if (isYouTubeActive && ytPlayer) {
+                    ytPlayer.pauseVideo();
+                } else if (mainVideo) {
+                    mainVideo.pause();
+                }
+
+                // Pause silence timer
+                if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+                if (interimSaveInterval) { clearInterval(interimSaveInterval); interimSaveInterval = null; }
+
+                pauseRecordBtn.textContent = '▶️ Resume';
+                recordingIndicator.querySelector('span').textContent = 'Paused';
+                console.log('⏸️ Recording paused');
+
+            } else if (mediaRecorder.state === 'paused') {
+                // Resume recording
+                mediaRecorder.resume();
+                if (recognition) {
+                    try { recognition.start(); } catch(e) {}
+                }
+
+                // Resume video too
+                if (isYouTubeActive && ytPlayer) {
+                    ytPlayer.playVideo();
+                } else if (mainVideo) {
+                    mainVideo.play();
+                }
+
+                // Restart silence timer
+                silenceTimer = setTimeout(function() {
+                    if (isRecording) { stopRecordBtn.click(); }
+                }, SILENCE_TIMEOUT);
+                interimSaveInterval = setInterval(function() {
+                    if (lastInterimTranscript && isRecording) {
+                        let saveTime = getCurrentVideoTime();
+                        if (transcriptSegments.length > 0) {
+                            const lastTime = transcriptSegments[transcriptSegments.length - 1].time;
+                            if (saveTime <= lastTime) saveTime = lastTime + 1;
+                        }
+                        transcriptSegments.push({ time: saveTime, text: lastInterimTranscript, _interim: true });
+                        finalTranscript += lastInterimTranscript + ' ';
+                        lastInterimTranscript = '';
+                    }
+                }, 5000);
+
+                pauseRecordBtn.textContent = '⏸️ Pause';
+                recordingIndicator.querySelector('span').textContent = 'Recording...';
+                console.log('▶️ Recording resumed');
             }
         });
 
@@ -1392,6 +1932,46 @@
                 segmentClip.dataset.startTime = startTime;
                 segmentClip.dataset.endTime = endTime;
                 segmentClip.dataset.text = segment.text;
+                segmentClip.dataset.recordingId = recording.id;
+
+                // Add delete button (X) to each segment
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'segment-delete-btn';
+                deleteBtn.textContent = '✕';
+                deleteBtn.title = 'Delete this segment';
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();  // Don't trigger segment click
+                    if (!confirm('이 세그먼트를 삭제하시겠습니까?')) return;
+
+                    // 1) Remove this segment from DOM
+                    segmentClip.remove();
+
+                    // 2) Remove from recording's segments array
+                    const segIdx = recording.segments.findIndex(
+                        s => s.time === segment.time && s.text === segment.text
+                    );
+                    if (segIdx !== -1) recording.segments.splice(segIdx, 1);
+
+                    // 3) If all segments of this recording are deleted, remove the recording
+                    if (recording.segments.length === 0) {
+                        const recIdx = recordedAudios.indexOf(recording);
+                        if (recIdx !== -1) {
+                            URL.revokeObjectURL(recording.url);
+                            recordedAudios.splice(recIdx, 1);
+                        }
+                        if (recordedAudios.length === 0) exportBtn.disabled = true;
+                    }
+
+                    // 4) Stop any playing audio and hide subtitle
+                    if (currentlyPlayingAudio) {
+                        currentlyPlayingAudio.pause();
+                        currentlyPlayingAudio = null;
+                    }
+                    subtitleOverlay.classList.remove('active');
+
+                    console.log('🗑️ Segment deleted');
+                });
+                segmentClip.appendChild(deleteBtn);
 
                 // Click event: Show text + seek video (NO audio - just review)
                 segmentClip.addEventListener('click', function() {
@@ -1796,6 +2376,20 @@
                     e.preventDefault();
                     skipVideo(5);
                     break;
+
+                // K: Play/Pause video (same as YouTube shortcut)
+                case 'KeyK':
+                    e.preventDefault();
+                    if (isYouTubeActive && ytPlayer) {
+                        const state = ytPlayer.getPlayerState();
+                        if (state === 1) ytPlayer.pauseVideo();
+                        else ytPlayer.playVideo();
+                    } else if (mainVideo) {
+                        if (mainVideo.paused) mainVideo.play();
+                        else mainVideo.pause();
+                    }
+                    console.log('⏯️ Video play/pause toggled');
+                    break;
             }
         });
 
@@ -1813,8 +2407,238 @@
 
         console.log('⌨️ Keyboard shortcuts ready:');
         console.log('   SPACE = Start/Stop recording');
+        console.log('   K = Play/Pause video');
         console.log('   ESC = Stop playback');
         console.log('   ←/→ = Skip video 5 seconds');
+
+        // ============================================
+        // SHORTCUTS HELP MODAL
+        // ============================================
+        const shortcutsHelpBtn = document.getElementById('shortcuts-help-btn');
+        const shortcutsModal = document.getElementById('shortcuts-modal');
+        const shortcutsCloseBtn = document.getElementById('shortcuts-close-btn');
+
+        // "?" 버튼 클릭 → 모달 열기
+        shortcutsHelpBtn.addEventListener('click', function() {
+            shortcutsModal.classList.add('active');
+        });
+
+        // "닫기" 버튼 클릭 → 모달 닫기
+        shortcutsCloseBtn.addEventListener('click', function() {
+            shortcutsModal.classList.remove('active');
+        });
+
+        // 모달 바깥 (어두운 배경) 클릭 → 모달 닫기
+        shortcutsModal.addEventListener('click', function(e) {
+            if (e.target === shortcutsModal) {
+                shortcutsModal.classList.remove('active');
+            }
+        });
+
+        // ============================================
+        // AUDIO WAVEFORM VISUALIZER
+        // ============================================
+
+        function setupAudioVisualizer() {
+            if (audioContext) return;  // Already set up
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;  // Number of frequency bins
+
+            // Connect: video audio → analyser → speakers
+            audioSourceNode = audioContext.createMediaElementSource(mainVideo);
+            audioSourceNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            visualizerActive = true;
+            drawVisualizer();
+            console.log('🎵 Audio visualizer ready!');
+        }
+
+        function drawVisualizer() {
+            if (!visualizerActive) return;
+            requestAnimationFrame(drawVisualizer);
+
+            // Resize canvas to match actual pixel size
+            const rect = visualizerCanvas.getBoundingClientRect();
+            visualizerCanvas.width = rect.width * window.devicePixelRatio;
+            visualizerCanvas.height = rect.height * window.devicePixelRatio;
+            visualizerCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            // Get frequency data
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            // Clear canvas
+            visualizerCtx.clearRect(0, 0, width, height);
+
+            // Draw frequency bars
+            const barWidth = width / bufferLength;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const barHeight = (dataArray[i] / 255) * height;
+
+                // Color: green (low) → yellow (mid) → red (high)
+                const hue = 120 - (dataArray[i] / 255) * 120;
+                visualizerCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
+
+                visualizerCtx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
+                x += barWidth;
+            }
+
+            // Reset scale for next frame
+            visualizerCtx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+
+        // ============================================
+        // SRT / VTT SUBTITLE FILE UPLOAD
+        // ============================================
+
+        const subtitleFileInput = document.getElementById('subtitle-file-input');
+
+        // Parse SRT timestamp "00:01:23,456" → seconds
+        function parseSrtTime(timeStr) {
+            const parts = timeStr.trim().replace(',', '.').split(':');
+            const hours = parseFloat(parts[0]) || 0;
+            const minutes = parseFloat(parts[1]) || 0;
+            const seconds = parseFloat(parts[2]) || 0;
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+
+        // Parse SRT file content → array of { start, end, text }
+        function parseSRT(content) {
+            const subtitles = [];
+            const blocks = content.trim().replace(/\r\n/g, '\n').split('\n\n');
+
+            for (const block of blocks) {
+                const lines = block.split('\n');
+                // Find the timestamp line (contains "-->")
+                let timeLineIdx = -1;
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].includes('-->')) { timeLineIdx = i; break; }
+                }
+                if (timeLineIdx === -1) continue;
+
+                const timeParts = lines[timeLineIdx].split('-->');
+                const start = parseSrtTime(timeParts[0]);
+                const end = parseSrtTime(timeParts[1]);
+                const text = lines.slice(timeLineIdx + 1).join(' ').trim();
+
+                if (text) {
+                    subtitles.push({ start, end, text });
+                }
+            }
+
+            return subtitles;
+        }
+
+        // Parse VTT file content → array of { start, end, text }
+        function parseVTT(content) {
+            // VTT is similar to SRT but uses "." instead of "," for ms
+            // and has a "WEBVTT" header
+            const cleaned = content.replace(/^WEBVTT.*\n/i, '');
+            return parseSRT(cleaned);
+        }
+
+        // Display all subtitles in the Source track
+        function displaySubtitlesInTimeline(subtitles) {
+            // Clear existing source segments
+            sourceTrack.innerHTML = '';
+            sourceSegments = subtitles;
+
+            for (const sub of subtitles) {
+                const segmentClip = document.createElement('div');
+                segmentClip.className = 'transcript-segment';
+                segmentClip.style.left = (sub.start * PIXELS_PER_SECOND) + 'px';
+                const duration = sub.end - sub.start;
+                segmentClip.style.width = Math.max(duration * PIXELS_PER_SECOND, 60) + 'px';
+                segmentClip.style.backgroundColor = '#2196f3';
+                segmentClip.style.borderLeft = '3px solid #1565c0';
+                segmentClip.textContent = sub.text;
+
+                // Click: seek video to this subtitle's time
+                (function(time, text) {
+                    segmentClip.addEventListener('click', function() {
+                        if (isYouTubeActive && ytPlayer) {
+                            ytPlayer.seekTo(time, true);
+                        } else if (mainVideo) {
+                            mainVideo.currentTime = time;
+                        }
+                        subtitleText.textContent = text;
+                        subtitleOverlay.classList.add('active');
+                    });
+                })(sub.start, sub.text);
+
+                sourceTrack.appendChild(segmentClip);
+            }
+
+            console.log('📖 Loaded ' + subtitles.length + ' subtitles into Source track');
+        }
+
+        // Show source subtitle in real-time as video plays
+        let currentSourceSubIdx = -1;
+        function updateSourceSubtitle() {
+            if (sourceSegments.length === 0) {
+                requestAnimationFrame(updateSourceSubtitle);
+                return;
+            }
+
+            const time = getCurrentVideoTime();
+            let found = -1;
+
+            for (let i = 0; i < sourceSegments.length; i++) {
+                if (time >= sourceSegments[i].start && time <= sourceSegments[i].end) {
+                    found = i;
+                    break;
+                }
+            }
+
+            // Show source subtitle overlay (only when not recording)
+            if (found !== -1 && found !== currentSourceSubIdx && !isRecording) {
+                currentSourceSubIdx = found;
+                subtitleText.textContent = '📖 ' + sourceSegments[found].text;
+                subtitleOverlay.classList.add('active');
+            } else if (found === -1 && currentSourceSubIdx !== -1 && !isRecording) {
+                currentSourceSubIdx = -1;
+                subtitleOverlay.classList.remove('active');
+            }
+
+            requestAnimationFrame(updateSourceSubtitle);
+        }
+        updateSourceSubtitle();
+
+        // File input handler
+        subtitleFileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                let subtitles;
+
+                if (file.name.endsWith('.vtt')) {
+                    subtitles = parseVTT(content);
+                } else {
+                    subtitles = parseSRT(content);
+                }
+
+                if (subtitles.length === 0) {
+                    alert('자막을 찾을 수 없습니다. SRT 또는 VTT 형식인지 확인해주세요.');
+                    return;
+                }
+
+                displaySubtitlesInTimeline(subtitles);
+                alert('✅ 자막 ' + subtitles.length + '개가 로드되었습니다!');
+            };
+            reader.readAsText(file);
+        });
     </script>
 </body>
 </html>

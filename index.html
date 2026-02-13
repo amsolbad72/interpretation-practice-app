@@ -759,7 +759,7 @@
         .audio-visualizer-container canvas {
             display: block;
             width: 100%;
-            height: 60px;
+            height: 80px;
         }
 
         .visualizer-label {
@@ -769,6 +769,264 @@
             font-size: 11px;
             color: #666;
             z-index: 5;
+        }
+
+        /* Practice mode toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #555;
+        }
+
+        .mode-btn {
+            padding: 8px 14px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            background-color: #333;
+            color: #999;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background-color: #4caf50;
+            color: white;
+            font-weight: bold;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background-color: #444;
+        }
+
+        /* Dual tasking counter */
+        .dual-task-overlay {
+            position: fixed;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 300;
+            text-align: center;
+            display: none;
+        }
+
+        .dual-task-overlay.active {
+            display: block;
+        }
+
+        .dual-task-number {
+            font-size: 64px;
+            font-weight: bold;
+            color: #ff9800;
+            line-height: 1;
+        }
+
+        .dual-task-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .dual-task-hint {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Decalage slider */
+        .decalage-control {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-left: 8px;
+        }
+
+        .decalage-control.active {
+            display: flex;
+        }
+
+        .decalage-control label {
+            font-size: 12px;
+            color: #ccc;
+            white-space: nowrap;
+        }
+
+        .decalage-control input[type="range"] {
+            width: 80px;
+            accent-color: #ff9800;
+        }
+
+        .decalage-value {
+            font-size: 13px;
+            color: #ff9800;
+            font-weight: bold;
+            min-width: 25px;
+        }
+
+        /* Decalage "start now" flash */
+        .decalage-cue {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #4caf50;
+            z-index: 600;
+            display: none;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .decalage-cue.flash {
+            display: block;
+            animation: cueFade 1.5s ease-out forwards;
+        }
+
+        @keyframes cueFade {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+        }
+
+        /* Feedback checklist */
+        .feedback-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 16px;
+            z-index: 300;
+            width: 280px;
+            display: none;
+        }
+
+        .feedback-panel.active {
+            display: block;
+        }
+
+        .feedback-panel h3 {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .feedback-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .feedback-item input[type="checkbox"] {
+            margin-top: 3px;
+            accent-color: #4caf50;
+            width: 16px;
+            height: 16px;
+        }
+
+        .feedback-item label {
+            color: #ccc;
+            font-size: 13px;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .feedback-item.checked label {
+            color: #4caf50;
+            text-decoration: line-through;
+        }
+
+        .feedback-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 48px;
+            height: 48px;
+            background-color: #555;
+            color: #fff;
+            border: 2px solid #888;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .feedback-toggle-btn:hover {
+            background-color: #666;
+        }
+
+        /* Sight Translation (ST) mode */
+        .st-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .st-overlay.active {
+            display: flex;
+        }
+
+        .st-sentence {
+            font-size: 32px;
+            color: #fff;
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .st-progress {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .st-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .st-controls button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .st-next-btn {
+            background-color: #4caf50;
+        }
+
+        .st-close-btn {
+            background-color: #f44336;
+        }
+
+        .st-timer {
+            font-size: 18px;
+            color: #ff9800;
+            margin-bottom: 10px;
         }
 
         .visualizer-unavailable {
@@ -806,6 +1064,14 @@
 
         <!-- Recording controls -->
         <div class="recording-controls">
+            <!-- Practice mode toggle -->
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="mode-interp-btn" data-mode="interpretation">🎯 통역</button>
+                <button class="mode-btn" id="mode-shadow-btn" data-mode="shadowing">🗣️ 쉐도잉</button>
+                <label class="mode-btn" id="mode-st-btn" for="st-file-input" style="cursor:pointer;">📄 시역</label>
+                <input type="file" id="st-file-input" accept=".txt" style="display:none;">
+            </div>
+
             <div class="recording-indicator" id="recording-indicator">
                 <div class="recording-dot"></div>
                 <span>Recording...</span>
@@ -850,6 +1116,13 @@
                 <button class="speed-btn" data-speed="1.25">1.25x</button>
                 <button class="speed-btn" data-speed="1.5">1.5x</button>
             </div>
+
+            <!-- Decalage control (visible in shadowing mode) -->
+            <div class="decalage-control" id="decalage-control">
+                <label>Décalage:</label>
+                <input type="range" id="decalage-slider" min="0" max="5" step="0.5" value="0">
+                <span class="decalage-value" id="decalage-value">0s</span>
+            </div>
         </div>
 
         <!-- Live subtitles overlay -->
@@ -870,7 +1143,7 @@
 
     <!-- Audio Waveform Visualizer -->
     <div class="audio-visualizer-container" id="visualizer-container">
-        <span class="visualizer-label">Audio Waveform</span>
+        <span class="visualizer-label">Video / Mic Waveform</span>
         <canvas id="audio-visualizer"></canvas>
     </div>
 
@@ -919,6 +1192,53 @@
     </div>
 
     <!-- Keyboard shortcuts help button -->
+    <!-- Decalage cue flash -->
+    <div class="decalage-cue" id="decalage-cue">🗣️ 지금 시작!</div>
+
+    <!-- Sight Translation Overlay -->
+    <div class="st-overlay" id="st-overlay">
+        <div class="st-progress" id="st-progress">1 / 10</div>
+        <div class="st-timer" id="st-timer">0.0s</div>
+        <div class="st-sentence" id="st-sentence">문장이 여기에 표시됩니다</div>
+        <div class="st-controls">
+            <button class="st-next-btn" id="st-next-btn">다음 문장 →</button>
+            <button class="st-close-btn" id="st-close-btn">종료</button>
+        </div>
+    </div>
+
+    <!-- Feedback Checklist -->
+    <button class="feedback-toggle-btn" id="feedback-toggle-btn" title="피드백 체크리스트">📋</button>
+    <div class="feedback-panel" id="feedback-panel">
+        <h3>📋 피드백 체크리스트</h3>
+        <div class="feedback-item" id="fb-1">
+            <input type="checkbox" id="fb-check-1">
+            <label for="fb-check-1">동사 처리가 늦지 않았는가?</label>
+        </div>
+        <div class="feedback-item" id="fb-2">
+            <input type="checkbox" id="fb-check-2">
+            <label for="fb-check-2">문장이 너무 길어서 꼬이지 않았는가? (Salami technique)</label>
+        </div>
+        <div class="feedback-item" id="fb-3">
+            <input type="checkbox" id="fb-check-3">
+            <label for="fb-check-3">내 목소리가 연사를 덮어버리지 않았는가?</label>
+        </div>
+        <div class="feedback-item" id="fb-4">
+            <input type="checkbox" id="fb-check-4">
+            <label for="fb-check-4">추임새(어, 음)를 쓰지 않았는가?</label>
+        </div>
+        <div class="feedback-item" id="fb-5">
+            <input type="checkbox" id="fb-check-5">
+            <label for="fb-check-5">빠뜨린 핵심 내용이 없는가?</label>
+        </div>
+    </div>
+
+    <!-- Dual Tasking Counter (shadowing mode) -->
+    <div class="dual-task-overlay" id="dual-task-overlay">
+        <div class="dual-task-number" id="dual-task-number">100</div>
+        <div class="dual-task-label">듀얼 태스킹</div>
+        <div class="dual-task-hint">D키: 다음 숫자 / R키: 리셋</div>
+    </div>
+
     <button class="shortcuts-help-btn" id="shortcuts-help-btn" title="키보드 단축키 보기">?</button>
 
     <!-- Keyboard shortcuts modal -->
@@ -944,6 +1264,14 @@
             <div class="shortcut-row">
                 <span class="shortcut-key">→</span>
                 <span class="shortcut-desc">5초 앞으로</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-key">D</span>
+                <span class="shortcut-desc">듀얼 태스킹 숫자 -1 (쉐도잉)</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-key">R</span>
+                <span class="shortcut-desc">듀얼 태스킹 리셋 (쉐도잉)</span>
             </div>
             <button class="shortcuts-close-btn" id="shortcuts-close-btn">닫기</button>
         </div>
@@ -998,12 +1326,17 @@
 
         // Audio visualizer state
         let audioContext = null;
-        let analyser = null;
+        let analyser = null;         // Video audio analyser
+        let micAnalyser = null;      // Mic audio analyser
         let audioSourceNode = null;
         let visualizerActive = false;
 
         // Source subtitle state
         let sourceSegments = [];
+
+        // Practice mode: 'interpretation' or 'shadowing'
+        let practiceMode = 'interpretation';
+        let dualTaskCounter = 100;
 
         // ============================================
         // TIMELINE FUNCTIONALITY
@@ -1220,6 +1553,15 @@
             // Resume audio context if suspended (browser policy)
             if (audioContext && audioContext.state === 'suspended') {
                 audioContext.resume();
+            }
+            // Decalage cue: show "start now!" after delay
+            if (practiceMode === 'shadowing' && decalageSeconds > 0) {
+                setTimeout(function() {
+                    decalageCue.classList.remove('flash');
+                    void decalageCue.offsetWidth; // Force reflow for re-animation
+                    decalageCue.classList.add('flash');
+                    setTimeout(function() { decalageCue.classList.remove('flash'); }, 1500);
+                }, decalageSeconds * 1000);
             }
             // Auto-start recording (only if mic is already ready)
             if (!isRecording && !startRecordBtn.disabled && isMicReady()) {
@@ -1598,6 +1940,10 @@
                     console.log('✅ Recording saved with transcript:', pendingRecording.transcript);
                     console.log('   Segments:', pendingRecording.segments);
 
+                    // Post-recording analysis
+                    analyzeFillerWords(pendingRecording.transcript);
+                    analyzeSentenceLength(pendingRecording.segments);
+
                     // Enable export button (now we have something to export!)
                     exportBtn.disabled = false;
 
@@ -1670,6 +2016,11 @@
                     return;
                 }
 
+                // Setup mic analyser for dual waveform display
+                if (audioContext && !micAnalyser) {
+                    setupMicAnalyser();
+                }
+
                 // Create a MediaRecorder to record the audio stream
                 mediaRecorder = new MediaRecorder(audioStream);
 
@@ -1723,9 +2074,13 @@
                 recordingStartVideoTime = getCurrentVideoTime();  // Remember video time at recording start
                 console.log('🔴 Recording started at video time:', formatTime(Math.floor(recordingStartVideoTime)));
 
-                // Start speech recognition with TARGET language (interpretation language)
+                // Start speech recognition
+                // Shadowing mode: recognize SOURCE language (repeat same language)
+                // Interpretation mode: recognize TARGET language (translate)
                 if (recognition) {
-                    const selectedLanguage = targetLanguage.value;
+                    const selectedLanguage = practiceMode === 'shadowing'
+                        ? sourceLanguage.value
+                        : targetLanguage.value;
                     recognition.lang = selectedLanguage;
 
                     // Mark that we're starting a new recording session
@@ -2332,6 +2687,151 @@
         });
 
         // ============================================
+        // SIGHT TRANSLATION (ST) MODE
+        // ============================================
+        const stFileInput = document.getElementById('st-file-input');
+        const stOverlay = document.getElementById('st-overlay');
+        const stSentence = document.getElementById('st-sentence');
+        const stProgress = document.getElementById('st-progress');
+        const stTimer = document.getElementById('st-timer');
+        const stNextBtn = document.getElementById('st-next-btn');
+        const stCloseBtn = document.getElementById('st-close-btn');
+
+        let stSentences = [];
+        let stCurrentIdx = 0;
+        let stTimerInterval = null;
+        let stStartTime = 0;
+
+        // Load text file and split into sentences
+        stFileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result.trim();
+                // Split by sentence-ending punctuation or newlines
+                stSentences = text.split(/(?<=[.!?。])\s+|\n+/).filter(function(s) {
+                    return s.trim().length > 0;
+                });
+
+                if (stSentences.length === 0) {
+                    alert('문장을 찾을 수 없습니다.');
+                    return;
+                }
+
+                stCurrentIdx = 0;
+                showSTSentence();
+                stOverlay.classList.add('active');
+                console.log('📄 Sight Translation: ' + stSentences.length + ' sentences loaded');
+            };
+            reader.readAsText(file);
+            // Reset input so same file can be reloaded
+            this.value = '';
+        });
+
+        function showSTSentence() {
+            if (stCurrentIdx >= stSentences.length) {
+                stSentence.textContent = '✅ 모든 문장을 완료했습니다!';
+                stProgress.textContent = '완료!';
+                stNextBtn.textContent = '처음부터 →';
+                clearInterval(stTimerInterval);
+                return;
+            }
+
+            stSentence.textContent = stSentences[stCurrentIdx];
+            stProgress.textContent = (stCurrentIdx + 1) + ' / ' + stSentences.length;
+            stNextBtn.textContent = '다음 문장 →';
+
+            // Reset timer
+            clearInterval(stTimerInterval);
+            stStartTime = Date.now();
+            stTimerInterval = setInterval(function() {
+                const elapsed = ((Date.now() - stStartTime) / 1000).toFixed(1);
+                stTimer.textContent = elapsed + 's';
+            }, 100);
+        }
+
+        stNextBtn.addEventListener('click', function() {
+            if (stCurrentIdx >= stSentences.length) {
+                stCurrentIdx = 0;  // Restart
+            } else {
+                stCurrentIdx++;
+            }
+            showSTSentence();
+        });
+
+        stCloseBtn.addEventListener('click', function() {
+            stOverlay.classList.remove('active');
+            clearInterval(stTimerInterval);
+        });
+
+        // ============================================
+        // FEEDBACK CHECKLIST
+        // ============================================
+        const feedbackToggleBtn = document.getElementById('feedback-toggle-btn');
+        const feedbackPanel = document.getElementById('feedback-panel');
+
+        feedbackToggleBtn.addEventListener('click', function() {
+            feedbackPanel.classList.toggle('active');
+        });
+
+        // Checkbox styling: add 'checked' class to parent for strikethrough
+        document.querySelectorAll('.feedback-item input[type="checkbox"]').forEach(function(cb) {
+            cb.addEventListener('change', function() {
+                this.closest('.feedback-item').classList.toggle('checked', this.checked);
+            });
+        });
+
+        // ============================================
+        // PRACTICE MODE TOGGLE (Interpretation ↔ Shadowing)
+        // ============================================
+        const modeInterpBtn = document.getElementById('mode-interp-btn');
+        const modeShadowBtn = document.getElementById('mode-shadow-btn');
+        const dualTaskOverlay = document.getElementById('dual-task-overlay');
+        const dualTaskNumberEl = document.getElementById('dual-task-number');
+
+        function setPracticeMode(mode) {
+            practiceMode = mode;
+
+            if (mode === 'shadowing') {
+                modeInterpBtn.classList.remove('active');
+                modeShadowBtn.classList.add('active');
+                dualTaskOverlay.classList.add('active');
+                decalageControl.classList.add('active');
+                dualTaskCounter = 100;
+                dualTaskNumberEl.textContent = '100';
+                console.log('🗣️ Shadowing mode activated');
+            } else {
+                modeShadowBtn.classList.remove('active');
+                modeInterpBtn.classList.add('active');
+                dualTaskOverlay.classList.remove('active');
+                decalageControl.classList.remove('active');
+                console.log('🎯 Interpretation mode activated');
+            }
+        }
+
+        // Decalage controls
+        const decalageControl = document.getElementById('decalage-control');
+        const decalageSlider = document.getElementById('decalage-slider');
+        const decalageValueEl = document.getElementById('decalage-value');
+        const decalageCue = document.getElementById('decalage-cue');
+        let decalageSeconds = 0;
+
+        decalageSlider.addEventListener('input', function() {
+            decalageSeconds = parseFloat(this.value);
+            decalageValueEl.textContent = decalageSeconds + 's';
+        });
+
+        modeInterpBtn.addEventListener('click', function() {
+            setPracticeMode('interpretation');
+        });
+
+        modeShadowBtn.addEventListener('click', function() {
+            setPracticeMode('shadowing');
+        });
+
+        // ============================================
         // KEYBOARD SHORTCUTS
         // ============================================
         document.addEventListener('keydown', function(e) {
@@ -2390,6 +2890,30 @@
                     }
                     console.log('⏯️ Video play/pause toggled');
                     break;
+
+                // D: Dual tasking counter (decrease by 1)
+                case 'KeyD':
+                    if (practiceMode === 'shadowing' && dualTaskOverlay.classList.contains('active')) {
+                        e.preventDefault();
+                        if (dualTaskCounter > 0) {
+                            dualTaskCounter--;
+                            dualTaskNumberEl.textContent = dualTaskCounter;
+                            if (dualTaskCounter === 0) {
+                                dualTaskNumberEl.style.color = '#4caf50';
+                            }
+                        }
+                    }
+                    break;
+
+                // R: Reset dual tasking counter
+                case 'KeyR':
+                    if (practiceMode === 'shadowing' && dualTaskOverlay.classList.contains('active')) {
+                        e.preventDefault();
+                        dualTaskCounter = 100;
+                        dualTaskNumberEl.textContent = '100';
+                        dualTaskNumberEl.style.color = '#ff9800';
+                    }
+                    break;
             }
         });
 
@@ -2444,23 +2968,37 @@
 
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;  // Number of frequency bins
+            analyser.fftSize = 256;
 
             // Connect: video audio → analyser → speakers
             audioSourceNode = audioContext.createMediaElementSource(mainVideo);
             audioSourceNode.connect(analyser);
             analyser.connect(audioContext.destination);
 
+            // Setup mic analyser if mic stream is available
+            if (audioStream && audioStream.active) {
+                setupMicAnalyser();
+            }
+
             visualizerActive = true;
             drawVisualizer();
             console.log('🎵 Audio visualizer ready!');
+        }
+
+        function setupMicAnalyser() {
+            if (!audioContext || !audioStream || micAnalyser) return;
+            micAnalyser = audioContext.createAnalyser();
+            micAnalyser.fftSize = 256;
+            const micSource = audioContext.createMediaStreamSource(audioStream);
+            micSource.connect(micAnalyser);
+            // Don't connect to destination (would cause feedback loop!)
+            console.log('🎤 Mic analyser ready!');
         }
 
         function drawVisualizer() {
             if (!visualizerActive) return;
             requestAnimationFrame(drawVisualizer);
 
-            // Resize canvas to match actual pixel size
             const rect = visualizerCanvas.getBoundingClientRect();
             visualizerCanvas.width = rect.width * window.devicePixelRatio;
             visualizerCanvas.height = rect.height * window.devicePixelRatio;
@@ -2468,32 +3006,130 @@
 
             const width = rect.width;
             const height = rect.height;
+            const halfH = height / 2;
 
-            // Get frequency data
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyser.getByteFrequencyData(dataArray);
-
-            // Clear canvas
             visualizerCtx.clearRect(0, 0, width, height);
 
-            // Draw frequency bars
+            // --- Top half: Video audio (green) ---
+            const bufferLength = analyser.frequencyBinCount;
+            const videoData = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(videoData);
+
             const barWidth = width / bufferLength;
             let x = 0;
-
             for (let i = 0; i < bufferLength; i++) {
-                const barHeight = (dataArray[i] / 255) * height;
-
-                // Color: green (low) → yellow (mid) → red (high)
-                const hue = 120 - (dataArray[i] / 255) * 120;
+                const barHeight = (videoData[i] / 255) * halfH;
+                const hue = 120 - (videoData[i] / 255) * 120;
                 visualizerCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
-
-                visualizerCtx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
+                visualizerCtx.fillRect(x, halfH - barHeight, barWidth - 1, barHeight);
                 x += barWidth;
             }
 
-            // Reset scale for next frame
+            // Divider line
+            visualizerCtx.strokeStyle = '#444';
+            visualizerCtx.beginPath();
+            visualizerCtx.moveTo(0, halfH);
+            visualizerCtx.lineTo(width, halfH);
+            visualizerCtx.stroke();
+
+            // --- Bottom half: Mic audio (cyan/blue) ---
+            if (micAnalyser) {
+                const micData = new Uint8Array(micAnalyser.frequencyBinCount);
+                micAnalyser.getByteFrequencyData(micData);
+
+                x = 0;
+                for (let i = 0; i < micData.length; i++) {
+                    const barHeight = (micData[i] / 255) * halfH;
+                    const hue = 200 + (micData[i] / 255) * 40;
+                    visualizerCtx.fillStyle = 'hsl(' + hue + ', 100%, 60%)';
+                    visualizerCtx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
+                    x += barWidth;
+                }
+            }
+
+            // Labels
+            visualizerCtx.font = '10px Arial';
+            visualizerCtx.fillStyle = '#666';
+            visualizerCtx.fillText('Video', 5, 12);
+            visualizerCtx.fillText('Mic', 5, halfH + 12);
+
             visualizerCtx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+
+        // ============================================
+        // FILLER WORD DETECTION
+        // ============================================
+        function analyzeFillerWords(transcript) {
+            if (!transcript) return;
+
+            // Common filler words/sounds in multiple languages
+            const fillerPatterns = [
+                /\b(um|uh|erm|er)\b/gi,       // English
+                /\b(어|음|그|저)\b/gi,           // Korean
+                /\b(euh|ben|donc)\b/gi,         // French
+                /\b(äh|ähm)\b/gi,               // German
+                /\b(えーと|あの|えー)\b/gi        // Japanese
+            ];
+
+            let totalCount = 0;
+            const details = [];
+
+            for (const pattern of fillerPatterns) {
+                const matches = transcript.match(pattern);
+                if (matches) {
+                    totalCount += matches.length;
+                    // Count each unique filler
+                    const counts = {};
+                    matches.forEach(function(m) {
+                        const lower = m.toLowerCase();
+                        counts[lower] = (counts[lower] || 0) + 1;
+                    });
+                    for (const word in counts) {
+                        details.push('"' + word + '" × ' + counts[word]);
+                    }
+                }
+            }
+
+            if (totalCount > 0) {
+                console.log('⚠️ Filler words detected: ' + totalCount);
+                console.log('   ' + details.join(', '));
+                // Show subtle notification (not blocking alert)
+                const msg = '추임새 감지: ' + totalCount + '회 (' + details.join(', ') + ')';
+                subtitleText.textContent = '⚠️ ' + msg;
+                subtitleOverlay.classList.add('active');
+                setTimeout(function() { subtitleOverlay.classList.remove('active'); }, 5000);
+            } else {
+                console.log('✅ No filler words detected!');
+            }
+        }
+
+        // ============================================
+        // SENTENCE LENGTH ANALYSIS
+        // ============================================
+        function analyzeSentenceLength(segments) {
+            if (!segments || segments.length === 0) return;
+
+            const lengths = segments.map(function(s) {
+                return s.text.split(/\s+/).length;
+            });
+
+            const avgLen = (lengths.reduce(function(a, b) { return a + b; }, 0) / lengths.length).toFixed(1);
+            const maxLen = Math.max.apply(null, lengths);
+            const longSentences = lengths.filter(function(l) { return l > 15; }).length;
+
+            let feedback = '📊 문장 분석: 평균 ' + avgLen + '단어, 최대 ' + maxLen + '단어';
+            if (longSentences > 0) {
+                feedback += '\n⚠️ 긴 문장 ' + longSentences + '개 — Salami technique을 적용해보세요!';
+            }
+
+            console.log(feedback);
+
+            // Show after filler word notification (delayed)
+            setTimeout(function() {
+                subtitleText.textContent = feedback;
+                subtitleOverlay.classList.add('active');
+                setTimeout(function() { subtitleOverlay.classList.remove('active'); }, 5000);
+            }, 5500);
         }
 
         // ============================================

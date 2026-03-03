@@ -1,3 +1,11 @@
-video.mp4
-nul
-.claude/
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Server recordings (personal data, large audio files)
+server/recordings/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -31,44 +31,81 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
             position: relative;
+            padding: 0;
         }
 
-        /* Video upload controls */
-        .video-upload-controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
+        /* Top control bar (above video) */
+        .control-bar {
+            width: 100%;
+            background-color: #1a1a1a;
+            padding: 8px 12px;
             display: flex;
-            gap: 10px;
-            z-index: 10;
+            flex-wrap: wrap;
+            gap: 6px;
             align-items: center;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0;
         }
 
-        .upload-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            background-color: #4CAF50;
+        .control-bar-left {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-bar-right {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .control-divider {
+            width: 1px;
+            height: 24px;
+            background-color: #444;
+            margin: 0 4px;
+        }
+
+        /* Video container (fills remaining space) */
+        .video-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* (video-upload-controls removed - now in control-bar) */
+
+        .upload-btn, .youtube-btn, .change-video-btn, .record-btn, .export-btn {
+            padding: 6px 12px;
+            font-size: 12px;
             color: white;
-            border-radius: 8px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
 
-        .upload-btn:hover {
-            background-color: #45a049;
-        }
+        .upload-btn { background-color: #4CAF50; }
+        .upload-btn:hover { background-color: #45a049; }
 
         .youtube-input {
-            padding: 12px;
-            font-size: 14px;
-            border: 2px solid #555;
-            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #555;
+            border-radius: 5px;
             background-color: #222;
             color: white;
-            width: 300px;
+            width: 200px;
         }
 
         .youtube-input:focus {
@@ -76,88 +113,20 @@
             border-color: #ff0000;
         }
 
-        .youtube-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            background-color: #ff0000;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
+        .youtube-btn { background-color: #ff0000; }
+        .youtube-btn:hover { background-color: #cc0000; }
 
-        .youtube-btn:hover {
-            background-color: #cc0000;
-        }
+        .change-video-btn { background-color: #ff9800; }
+        .change-video-btn:hover { background-color: #e68900; }
 
-        .change-video-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
+        /* (recording-controls removed - now in control-bar) */
 
-        .change-video-btn:hover {
-            background-color: #e68900;
-        }
-
-        /* Recording controls */
-        .recording-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            z-index: 10;
-            max-width: 600px;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .record-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .record-btn.start {
-            background-color: #ff4444;
-            color: white;
-        }
-
-        .record-btn.start:hover {
-            background-color: #cc0000;
-        }
-
-        .record-btn.pause {
-            background-color: #ff9800;
-            color: white;
-        }
-
-        .record-btn.pause:hover {
-            background-color: #e68a00;
-        }
-
-        .record-btn.stop {
-            background-color: #444;
-            color: white;
-        }
-
-        .record-btn.stop:hover {
-            background-color: #666;
-        }
+        .record-btn.start { background-color: #ff4444; }
+        .record-btn.start:hover { background-color: #cc0000; }
+        .record-btn.pause { background-color: #ff9800; }
+        .record-btn.pause:hover { background-color: #e68a00; }
+        .record-btn.stop { background-color: #444; }
+        .record-btn.stop:hover { background-color: #666; }
 
         .record-btn:disabled {
             opacity: 0.5;
@@ -168,12 +137,13 @@
         .recording-indicator {
             display: none;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
             background-color: rgba(255, 68, 68, 0.9);
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 12px;
             color: white;
             font-weight: bold;
+            font-size: 11px;
         }
 
         .recording-indicator.active {
@@ -181,8 +151,8 @@
         }
 
         .recording-dot {
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             background-color: white;
             border-radius: 50%;
             animation: pulse 1.5s ease-in-out infinite;
@@ -403,6 +373,163 @@
             display: block;
         }
 
+        /* Report button on segments (hidden by default, shows on hover) */
+        .segment-report-btn {
+            display: none;
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 18px;
+            height: 18px;
+            background-color: #1a4a2a;
+            color: #4caf50;
+            border: 2px solid #4caf50;
+            border-radius: 50%;
+            font-size: 8px;
+            line-height: 14px;
+            text-align: center;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .segment-report-btn:hover {
+            background-color: #2e7d32;
+            transform: scale(1.2);
+        }
+
+        .transcript-segment:hover .segment-report-btn {
+            display: block;
+        }
+
+        /* 리포트 모달 오버레이 */
+        .report-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .report-modal {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #e0e0e0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .report-modal h2 {
+            font-size: 16px;
+            color: #90caf9;
+            margin: 0 0 16px;
+        }
+
+        .report-section {
+            margin-bottom: 16px;
+        }
+
+        .report-section h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 1px;
+            margin: 0 0 8px;
+        }
+
+        .report-transcript-box {
+            background: #0d1117;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #ccc;
+            white-space: pre-wrap;
+            max-height: 90px;
+            overflow-y: auto;
+        }
+
+        .report-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .report-stat {
+            background: #0d1117;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .report-stat .stat-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #90caf9;
+        }
+
+        .report-stat .stat-label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .report-filler-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .report-filler-tag {
+            background: #2a1a35;
+            border: 1px solid #7b3fe4;
+            color: #ce93d8;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: 11px;
+        }
+
+        .report-suggestions {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .report-suggestions li {
+            background: #0d1117;
+            border: 1px solid #333;
+            border-left: 3px solid #4caf50;
+            border-radius: 0 6px 6px 0;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .report-close-btn {
+            display: block;
+            width: 100%;
+            margin-top: 16px;
+            padding: 9px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .report-close-btn:hover {
+            background: #444;
+        }
+
         /* Selected state: when user clicks a segment to review */
         .transcript-segment.selected {
             border-color: #fff;
@@ -474,10 +601,10 @@
         }
 
         .language-select {
-            padding: 8px 12px;
-            font-size: 13px;
-            border: 2px solid #555;
-            border-radius: 8px;
+            padding: 4px 6px;
+            font-size: 11px;
+            border: 1px solid #555;
+            border-radius: 4px;
             background-color: #333;
             color: white;
             cursor: pointer;
@@ -491,15 +618,15 @@
 
         /* Export button */
         .export-btn {
-            padding: 8px 16px;
-            font-size: 14px;
+            padding: 6px 12px;
+            font-size: 12px;
             background-color: #2196F3;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .export-btn:hover:not(:disabled) {
@@ -526,8 +653,8 @@
         }
 
         .speed-btn {
-            padding: 6px 10px;
-            font-size: 12px;
+            padding: 3px 6px;
+            font-size: 11px;
             border: 1px solid #555;
             border-radius: 6px;
             background-color: #333;
@@ -775,14 +902,14 @@
         .mode-toggle {
             display: flex;
             gap: 0;
-            border-radius: 6px;
+            border-radius: 4px;
             overflow: hidden;
-            border: 2px solid #555;
+            border: 1px solid #555;
         }
 
         .mode-btn {
-            padding: 8px 14px;
-            font-size: 13px;
+            padding: 4px 8px;
+            font-size: 11px;
             border: none;
             cursor: pointer;
             background-color: #333;
@@ -851,18 +978,18 @@
         }
 
         .decalage-control label {
-            font-size: 12px;
+            font-size: 11px;
             color: #ccc;
             white-space: nowrap;
         }
 
         .decalage-control input[type="range"] {
-            width: 80px;
+            width: 60px;
             accent-color: #ff9800;
         }
 
         .decalage-value {
-            font-size: 13px;
+            font-size: 11px;
             color: #ff9800;
             font-weight: bold;
             min-width: 25px;
@@ -1040,6 +1167,63 @@
             background-color: #111;
             border-top: 1px solid #333;
         }
+
+        /* Server status badge */
+        .server-status {
+            font-size: 10px;
+            padding: 3px 7px;
+            border-radius: 10px;
+            background-color: #333;
+            color: #aaa;
+            white-space: nowrap;
+            border: 1px solid #555;
+        }
+        .server-status.online  { background-color: #1a3a1a; color: #4caf50; border-color: #4caf50; }
+        .server-status.offline { background-color: #2a1a1a; color: #888;    border-color: #555; }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 900px) {
+            .control-bar {
+                padding: 6px 8px;
+                gap: 4px;
+            }
+            .control-bar-left,
+            .control-bar-right {
+                width: 100%;
+                justify-content: center;
+            }
+            .control-bar-right {
+                margin-left: 0;
+                border-top: 1px solid #333;
+                padding-top: 6px;
+            }
+            .youtube-input {
+                width: 140px;
+            }
+            .speed-control {
+                gap: 2px;
+            }
+            .speed-btn {
+                padding: 2px 4px;
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .control-bar-left,
+            .control-bar-right {
+                gap: 3px;
+            }
+            .youtube-input {
+                width: 100px;
+            }
+            .language-selector-group {
+                gap: 4px;
+            }
+            .control-divider {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1051,93 +1235,88 @@
 
     <!-- Top section: Video area -->
     <div class="video-section">
-        <!-- Video upload controls -->
-        <div class="video-upload-controls">
-            <label for="video-file-input" class="upload-btn">📁 Upload Video</label>
-            <input type="file" id="video-file-input" accept="video/*" style="display: none;">
-            <input type="text" id="youtube-url-input" placeholder="Or paste YouTube URL..." class="youtube-input">
-            <button id="load-youtube-btn" class="youtube-btn">Load YouTube</button>
-            <button id="change-video-btn" class="change-video-btn" style="display: none;">🔄 Change Video</button>
-            <label for="subtitle-file-input" class="upload-btn" style="background-color: #2196f3;">📖 자막 업로드 (.srt/.vtt)</label>
-            <input type="file" id="subtitle-file-input" accept=".srt,.vtt" style="display: none;">
-        </div>
-
-        <!-- Recording controls -->
-        <div class="recording-controls">
-            <!-- Practice mode toggle -->
-            <div class="mode-toggle">
-                <button class="mode-btn active" id="mode-interp-btn" data-mode="interpretation">🎯 통역</button>
-                <button class="mode-btn" id="mode-shadow-btn" data-mode="shadowing">🗣️ 쉐도잉</button>
-                <label class="mode-btn" id="mode-st-btn" for="st-file-input" style="cursor:pointer;">📄 시역</label>
-                <input type="file" id="st-file-input" accept=".txt" style="display:none;">
-            </div>
-
-            <div class="recording-indicator" id="recording-indicator">
-                <div class="recording-dot"></div>
-                <span>Recording...</span>
-            </div>
-            <button class="record-btn start" id="start-record-btn">🎙️ Start Recording</button>
-            <button class="record-btn pause" id="pause-record-btn" disabled>⏸️ Pause</button>
-            <button class="record-btn stop" id="stop-record-btn" disabled>⏹️ Stop Recording</button>
-
-            <!-- Language selectors -->
-            <div class="language-selector-group">
-                <div class="language-selector">
-                    <label for="source-language">Source:</label>
-                    <select id="source-language" class="language-select">
-                        <option value="en-US" selected>English</option>
-                        <option value="ko-KR">한국어</option>
-                        <option value="fr-FR">Français</option>
-                        <option value="de-DE">Deutsch</option>
-                        <option value="ja-JP">日本語</option>
-                    </select>
-                </div>
-                <div class="language-selector">
-                    <label for="target-language">→ Target:</label>
-                    <select id="target-language" class="language-select">
-                        <option value="en-US">English</option>
-                        <option value="ko-KR" selected>한국어</option>
-                        <option value="fr-FR">Français</option>
-                        <option value="de-DE">Deutsch</option>
-                        <option value="ja-JP">日本語</option>
-                    </select>
+        <!-- Control bar (above video) -->
+        <div class="control-bar">
+            <div class="control-bar-left">
+                <label for="video-file-input" class="upload-btn">📁 Upload</label>
+                <input type="file" id="video-file-input" accept="video/*" style="display: none;">
+                <input type="text" id="youtube-url-input" placeholder="YouTube URL..." class="youtube-input">
+                <button id="load-youtube-btn" class="youtube-btn">Load</button>
+                <button id="change-video-btn" class="change-video-btn" style="display: none;">🔄 Change</button>
+                <label for="subtitle-file-input" class="upload-btn" style="background-color: #2196f3;">📖 자막</label>
+                <input type="file" id="subtitle-file-input" accept=".srt,.vtt" style="display: none;">
+                <div class="control-divider"></div>
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="mode-interp-btn" data-mode="interpretation">🎯 통역</button>
+                    <button class="mode-btn" id="mode-shadow-btn" data-mode="shadowing">🗣️ 쉐도잉</button>
+                    <label class="mode-btn" id="mode-st-btn" for="st-file-input" style="cursor:pointer;">📄 시역</label>
+                    <input type="file" id="st-file-input" accept=".txt" style="display:none;">
                 </div>
             </div>
-
-            <!-- Export button -->
-            <button class="export-btn" id="export-btn" disabled>💾 Export</button>
-
-            <!-- Speed control -->
-            <div class="speed-control">
-                <label>Speed:</label>
-                <button class="speed-btn" data-speed="0.5">0.5x</button>
-                <button class="speed-btn" data-speed="0.75">0.75x</button>
-                <button class="speed-btn active" data-speed="1">1x</button>
-                <button class="speed-btn" data-speed="1.25">1.25x</button>
-                <button class="speed-btn" data-speed="1.5">1.5x</button>
-            </div>
-
-            <!-- Decalage control (visible in shadowing mode) -->
-            <div class="decalage-control" id="decalage-control">
-                <label>Décalage:</label>
-                <input type="range" id="decalage-slider" min="0" max="5" step="0.5" value="0">
-                <span class="decalage-value" id="decalage-value">0s</span>
+            <div class="control-bar-right">
+                <div class="recording-indicator" id="recording-indicator">
+                    <div class="recording-dot"></div>
+                    <span>REC</span>
+                </div>
+                <button class="record-btn start" id="start-record-btn">🎙️ Start</button>
+                <button class="record-btn pause" id="pause-record-btn" disabled>⏸️ Pause</button>
+                <button class="record-btn stop" id="stop-record-btn" disabled>⏹️ Stop</button>
+                <div class="control-divider"></div>
+                <div class="language-selector-group">
+                    <div class="language-selector">
+                        <label for="source-language">Src:</label>
+                        <select id="source-language" class="language-select">
+                            <option value="en-US" selected>EN</option>
+                            <option value="ko-KR">KO</option>
+                            <option value="fr-FR">FR</option>
+                            <option value="de-DE">DE</option>
+                            <option value="ja-JP">JP</option>
+                        </select>
+                    </div>
+                    <div class="language-selector">
+                        <label for="target-language">→</label>
+                        <select id="target-language" class="language-select">
+                            <option value="en-US">EN</option>
+                            <option value="ko-KR" selected>KO</option>
+                            <option value="fr-FR">FR</option>
+                            <option value="de-DE">DE</option>
+                            <option value="ja-JP">JP</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-divider"></div>
+                <div class="speed-control">
+                    <label>Speed:</label>
+                    <button class="speed-btn" data-speed="0.5">0.5x</button>
+                    <button class="speed-btn" data-speed="0.75">0.75x</button>
+                    <button class="speed-btn active" data-speed="1">1x</button>
+                    <button class="speed-btn" data-speed="1.25">1.25x</button>
+                    <button class="speed-btn" data-speed="1.5">1.5x</button>
+                </div>
+                <div class="decalage-control" id="decalage-control">
+                    <label>Décalage:</label>
+                    <input type="range" id="decalage-slider" min="0" max="5" step="0.5" value="0">
+                    <span class="decalage-value" id="decalage-value">0s</span>
+                </div>
+                <button class="export-btn" id="export-btn" disabled>💾 Export</button>
+                <div class="server-status" id="server-status" title="서버 연결 상태">⚪ 서버 확인 중...</div>
             </div>
         </div>
 
-        <!-- Live subtitles overlay -->
-        <div class="subtitle-overlay" id="subtitle-overlay">
-            <div class="subtitle-text" id="subtitle-text"></div>
-        </div>
+        <!-- Video container -->
+        <div class="video-container">
+            <div class="subtitle-overlay" id="subtitle-overlay">
+                <div class="subtitle-text" id="subtitle-text"></div>
+            </div>
 
-        <video id="main-video" controls>
-            <source src="video.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+            <video id="main-video" controls>
+                <source src="video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
 
-        <!-- YouTube iframe container (hidden by default) -->
-        <div id="youtube-container" style="display: none;">
-            <div id="youtube-player"></div>
+            <div id="youtube-container" style="display: none;">
+                <div id="youtube-player"></div>
+            </div>
         </div>
     </div>
 
@@ -1280,6 +1459,433 @@
     <script>
         // JavaScript code will go here
         console.log('Simultaneous Interpretation Practice App started!');
+
+        // ============================================
+        // INDEXEDDB - LOCAL DATA PERSISTENCE
+        // ============================================
+        // IndexedDB는 브라우저에 내장된 데이터베이스야.
+        // localStorage는 텍스트만 저장 가능하지만,
+        // IndexedDB는 오디오 Blob(바이너리) 같은 큰 데이터도 저장 가능!
+
+        const DB_NAME = 'InterpretationPracticeDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'recordings';
+
+        // DB 열기 (없으면 생성)
+        function openDB() {
+            return new Promise(function(resolve, reject) {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                // DB를 처음 만들거나 버전이 올라갈 때 실행
+                request.onupgradeneeded = function(event) {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        // keyPath: 각 녹음의 고유 식별자 (id 필드 사용)
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        console.log('📦 IndexedDB store created');
+                    }
+                };
+
+                request.onsuccess = function(event) {
+                    resolve(event.target.result);
+                };
+
+                request.onerror = function(event) {
+                    console.error('❌ IndexedDB open error:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        // 녹음 하나를 DB에 저장
+        function saveRecordingToDB(recording) {
+            return openDB().then(function(db) {
+                return new Promise(function(resolve, reject) {
+                    const tx = db.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+
+                    // ObjectURL은 저장 불가 → blob만 저장하고 나중에 URL 재생성
+                    const dataToSave = {
+                        id: recording.id,
+                        blob: recording.blob,
+                        timestamp: recording.timestamp,
+                        duration: recording.duration,
+                        transcript: recording.transcript,
+                        sourceLanguage: recording.sourceLanguage,
+                        targetLanguage: recording.targetLanguage,
+                        startVideoTime: recording.startVideoTime,
+                        segments: recording.segments
+                    };
+
+                    const request = store.put(dataToSave);
+                    request.onsuccess = function() {
+                        console.log('💾 Recording saved to IndexedDB (id:', recording.id, ')');
+                        resolve();
+                    };
+                    request.onerror = function(event) {
+                        console.error('❌ IndexedDB save error:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            });
+        }
+
+        // DB에서 모든 녹음 불러오기
+        function loadRecordingsFromDB() {
+            return openDB().then(function(db) {
+                return new Promise(function(resolve, reject) {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const request = store.getAll();
+
+                    request.onsuccess = function(event) {
+                        const records = event.target.result;
+                        console.log('📂 Loaded', records.length, 'recording(s) from IndexedDB');
+
+                        // blob → ObjectURL 재생성
+                        const restored = records.map(function(rec) {
+                            rec.url = URL.createObjectURL(rec.blob);
+                            return rec;
+                        });
+                        resolve(restored);
+                    };
+                    request.onerror = function(event) {
+                        console.error('❌ IndexedDB load error:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            });
+        }
+
+        // DB에서 녹음 하나 삭제
+        function deleteRecordingFromDB(recordingId) {
+            return openDB().then(function(db) {
+                return new Promise(function(resolve, reject) {
+                    const tx = db.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    const request = store.delete(recordingId);
+
+                    request.onsuccess = function() {
+                        console.log('🗑️ Recording deleted from IndexedDB (id:', recordingId, ')');
+                        resolve();
+                    };
+                    request.onerror = function(event) {
+                        console.error('❌ IndexedDB delete error:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            });
+        }
+
+        // DB에서 특정 녹음 업데이트 (세그먼트 삭제 등)
+        function updateRecordingInDB(recording) {
+            return saveRecordingToDB(recording);  // put()은 같은 id면 덮어쓰기
+        }
+
+        // ============================================
+        // SERVER API - 백엔드 서버 연동
+        // ============================================
+        // 서버가 켜져 있으면 녹음을 서버에도 저장하고,
+        // 서버가 꺼져 있으면 그냥 IndexedDB만 사용 (오프라인 대응)
+
+        const SERVER_URL = 'http://localhost:8000';
+        let isServerAvailable = false;
+
+        // 서버 상태 확인 (페이지 로드 시 한 번 체크)
+        function checkServerStatus() {
+            const badge = document.getElementById('server-status');
+
+            return fetch(SERVER_URL + '/', { signal: AbortSignal.timeout(3000) })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    isServerAvailable = data.status === 'ok';
+                    if (badge) {
+                        badge.textContent = '🟢 서버 연결됨';
+                        badge.className = 'server-status online';
+                    }
+                    console.log('🟢 서버 연결됨');
+                    return isServerAvailable;
+                })
+                .catch(function() {
+                    isServerAvailable = false;
+                    if (badge) {
+                        badge.textContent = '⚫ 로컬 전용';
+                        badge.className = 'server-status offline';
+                        badge.title = '서버가 꺼져 있어요. 로컬(IndexedDB)에만 저장됩니다.\n서버 켜는 법: server/ 폴더에서 python main.py 실행';
+                    }
+                    console.log('⚫ 서버 꺼져 있음 (로컬 저장만 사용)');
+                    return false;
+                });
+        }
+
+        // 녹음을 서버에 업로드
+        function uploadRecordingToServer(recording) {
+            if (!isServerAvailable) return Promise.resolve(false);
+
+            // FormData: 파일과 텍스트를 함께 보내는 방법
+            const formData = new FormData();
+
+            // 오디오 파일 추가
+            formData.append('audio', recording.blob, 'audio.webm');
+
+            // 메타데이터 (blob과 url은 서버에 보낼 수 없으니 제외)
+            const metadata = {
+                id: recording.id,
+                timestamp: recording.timestamp,
+                duration: recording.duration,
+                transcript: recording.transcript,
+                sourceLanguage: recording.sourceLanguage,
+                targetLanguage: recording.targetLanguage,
+                startVideoTime: recording.startVideoTime,
+                segments: recording.segments
+            };
+            formData.append('metadata', JSON.stringify(metadata));
+
+            return fetch(SERVER_URL + '/api/recordings', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                console.log('☁️ 서버 업로드 성공:', result.message);
+                // Whisper 전사가 pending이면 결과 폴링 시작
+                if (result.whisperStatus === 'pending') {
+                    startWhisperPolling(result.recordingId);
+                }
+                return true;
+            })
+            .catch(function(error) {
+                console.warn('⚠️ 서버 업로드 실패 (로컬에는 저장됨):', error);
+                return false;
+            });
+        }
+
+        // 서버에서 녹음 삭제
+        function deleteRecordingFromServer(recordingId) {
+            if (!isServerAvailable) return Promise.resolve(false);
+
+            return fetch(SERVER_URL + '/api/recordings/' + recordingId, {
+                method: 'DELETE'
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                console.log('☁️ 서버에서 삭제 성공:', result.message);
+                return true;
+            })
+            .catch(function(error) {
+                console.warn('⚠️ 서버 삭제 실패:', error);
+                return false;
+            });
+        }
+
+        // 페이지 로드 시 서버 상태 확인
+        checkServerStatus();
+
+        // Whisper 전사 결과 폴링 (업로드 후 완료될 때까지 2초마다 체크)
+        // 동시에 여러 녹음이 전사 중일 수 있어서 Map으로 관리
+        const whisperPollingTimers = new Map();  // recordingId → setInterval ID
+
+        function startWhisperPolling(recordingId) {
+            if (!isServerAvailable) return;
+            if (whisperPollingTimers.has(recordingId)) return;  // 이미 폴링 중
+
+            console.log('[Whisper] 결과 기다리는 중... (2초마다 체크)');
+
+            const timerId = setInterval(function() {
+                fetch(SERVER_URL + '/api/recordings/' + recordingId)
+                    .then(function(r) { return r.json(); })
+                    .then(function(meta) {
+                        const status = meta.whisperStatus;
+
+                        if (status === 'done') {
+                            // 전사 완료!
+                            clearInterval(timerId);
+                            whisperPollingTimers.delete(recordingId);
+                            onWhisperDone(recordingId, meta);
+
+                        } else if (status === 'error' || status === 'unavailable' || status === 'skipped') {
+                            // 오류 또는 불가 → 폴링 중단
+                            clearInterval(timerId);
+                            whisperPollingTimers.delete(recordingId);
+                            console.warn('[Whisper] 전사 실패/불가:', status, meta.whisperError || '');
+                        }
+                        // 'pending' 이면 계속 기다림
+                    })
+                    .catch(function() {
+                        // 서버 연결 끊어지면 폴링 중단
+                        clearInterval(timerId);
+                        whisperPollingTimers.delete(recordingId);
+                    });
+            }, 2000);  // 2초마다
+
+            whisperPollingTimers.set(recordingId, timerId);
+        }
+
+        function onWhisperDone(recordingId, meta) {
+            // 메모리의 recording 객체에도 Whisper 결과 반영
+            const recording = recordedAudios.find(function(r) { return r.id == recordingId; });
+            if (recording) {
+                recording.whisperTranscript = meta.whisperTranscript;
+                recording.whisperSegments = meta.whisperSegments;
+                recording.whisperLanguage = meta.whisperLanguage;
+            }
+
+            // 타임라인 세그먼트 툴팁 업데이트 (마우스 올리면 Whisper 텍스트 보임)
+            document.querySelectorAll('[data-recording-id="' + recordingId + '"]').forEach(function(el) {
+                const segIdx = parseInt(el.dataset.segmentIndex);
+                const wSeg = meta.whisperSegments && meta.whisperSegments[segIdx];
+                if (wSeg) {
+                    el.title = '[Web Speech] ' + el.dataset.text + '\n[Whisper] ' + wSeg.text;
+                }
+            });
+
+            // 화면에 완료 알림 표시
+            showWhisperNotification(meta.whisperTranscript);
+
+            console.log('[Whisper] 전사 완료! 언어:', meta.whisperLanguage);
+            console.log('[Whisper] 텍스트:', meta.whisperTranscript);
+        }
+
+        function showWhisperNotification(transcript) {
+            // 기존 알림 제거
+            const existing = document.getElementById('whisper-notification');
+            if (existing) existing.remove();
+
+            const notif = document.createElement('div');
+            notif.id = 'whisper-notification';
+            notif.style.cssText = [
+                'position:fixed', 'bottom:20px', 'right:20px', 'z-index:9999',
+                'background:#1a3a1a', 'border:1px solid #4caf50', 'border-radius:8px',
+                'padding:12px 16px', 'color:#fff', 'font-size:13px', 'max-width:340px',
+                'box-shadow:0 4px 12px rgba(0,0,0,0.5)'
+            ].join(';');
+            notif.innerHTML =
+                '<div style="color:#4caf50;font-weight:bold;margin-bottom:6px">✅ Whisper 전사 완료</div>' +
+                '<div style="color:#ccc;font-size:11px;line-height:1.5">' +
+                (transcript ? transcript.slice(0, 120) + (transcript.length > 120 ? '...' : '') : '(텍스트 없음)') +
+                '</div>' +
+                '<div style="color:#666;font-size:10px;margin-top:6px">타임라인 세그먼트에 마우스를 올려보세요</div>';
+
+            document.body.appendChild(notif);
+            setTimeout(function() { if (notif.parentNode) notif.remove(); }, 7000);
+        }
+
+        // ============================================
+        // Stage 3: 비교 리포트
+        // ============================================
+
+        // 특정 녹음의 리포트를 서버에서 가져와서 모달로 보여주는 함수
+        function showRecordingReport(recordingId) {
+            if (!isServerAvailable) {
+                alert('서버가 꺼져 있어. 서버를 켜고 다시 시도해봐!\n(cd server → python main.py)');
+                return;
+            }
+
+            fetch(SERVER_URL + '/api/recordings/' + recordingId + '/report')
+                .then(function(r) { return r.json(); })
+                .then(function(report) {
+                    if (report.error) {
+                        alert('리포트 준비 안 됨: ' + report.error);
+                        return;
+                    }
+                    renderReportModal(report);
+                })
+                .catch(function(err) {
+                    alert('리포트 로드 실패: ' + err.message);
+                });
+        }
+
+        // 리포트 데이터를 모달로 렌더링
+        function renderReportModal(report) {
+            // 기존 모달 제거
+            var existing = document.getElementById('report-modal-overlay');
+            if (existing) existing.remove();
+
+            var stats = report.stats || {};
+            var fillers = stats.fillerWords || {};
+            var fillerEntries = Object.entries(fillers);
+
+            // 유사도 색상 (높을수록 초록, 낮을수록 빨강)
+            var sim = stats.similarity || 0;
+            var simColor = sim >= 70 ? '#4caf50' : sim >= 40 ? '#ff9800' : '#f44336';
+
+            // 필러워드 태그 HTML
+            var fillerHtml = fillerEntries.length > 0
+                ? '<div class="report-section"><h3>💬 필러워드 (총 ' + stats.totalFillerWords + '개)</h3>' +
+                  '<div class="report-filler-tags">' +
+                  fillerEntries.map(function(e) {
+                      return '<span class="report-filler-tag">' + e[0] + ' × ' + e[1] + '</span>';
+                  }).join('') +
+                  '</div></div>'
+                : '';
+
+            // 개선 제안 HTML
+            var suggestions = report.suggestions || [];
+            var suggestionHtml = suggestions.map(function(s) {
+                return '<li>' + s + '</li>';
+            }).join('');
+
+            var overlay = document.createElement('div');
+            overlay.className = 'report-modal-overlay';
+            overlay.id = 'report-modal-overlay';
+
+            overlay.innerHTML =
+                '<div class="report-modal">' +
+                    '<h2>📊 녹음 비교 리포트</h2>' +
+
+                    '<div class="report-section">' +
+                        '<h3>🎤 Web Speech (브라우저 실시간 인식)</h3>' +
+                        '<div class="report-transcript-box">' +
+                            (report.webSpeechTranscript || '(저장된 텍스트 없음)') +
+                        '</div>' +
+                    '</div>' +
+
+                    '<div class="report-section">' +
+                        '<h3>🤖 Whisper (AI 정밀 전사)</h3>' +
+                        '<div class="report-transcript-box">' +
+                            (report.whisperTranscript || '(저장된 텍스트 없음)') +
+                        '</div>' +
+                    '</div>' +
+
+                    '<div class="report-section">' +
+                        '<h3>📈 통계</h3>' +
+                        '<div class="report-stats-grid">' +
+                            '<div class="report-stat">' +
+                                '<div class="stat-value">' + (stats.whisperWordCount || 0) + '</div>' +
+                                '<div class="stat-label">단어 수</div>' +
+                            '</div>' +
+                            '<div class="report-stat">' +
+                                '<div class="stat-value">' + (stats.wordsPerMinute || 0) + '</div>' +
+                                '<div class="stat-label">단어/분 (WPM)</div>' +
+                            '</div>' +
+                            '<div class="report-stat">' +
+                                '<div class="stat-value" style="color:' + simColor + '">' + sim + '%</div>' +
+                                '<div class="stat-label">인식 정확도</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+
+                    fillerHtml +
+
+                    '<div class="report-section">' +
+                        '<h3>💡 개선 제안</h3>' +
+                        '<ul class="report-suggestions">' + suggestionHtml + '</ul>' +
+                    '</div>' +
+
+                    '<button class="report-close-btn" id="report-close-btn">닫기</button>' +
+                '</div>';
+
+            document.body.appendChild(overlay);
+
+            // 닫기 버튼
+            document.getElementById('report-close-btn').addEventListener('click', function() {
+                overlay.remove();
+            });
+            // 오버레이 바깥 클릭해도 닫힘
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.remove();
+            });
+        }
 
         // ============================================
         // GET ALL HTML ELEMENTS FIRST
@@ -1447,6 +2053,44 @@
         // Initialize timeline
         createTimelineRuler();
         updatePlayhead();
+
+        // ============================================
+        // RESTORE SAVED RECORDINGS FROM INDEXEDDB
+        // ============================================
+        // 페이지 로드 시 과거에 저장한 녹음을 불러와서 타임라인에 표시
+        loadRecordingsFromDB().then(function(savedRecordings) {
+            if (savedRecordings.length > 0) {
+                recordedAudios = savedRecordings;
+                exportBtn.disabled = false;
+
+                // 각 녹음을 타임라인에 표시
+                savedRecordings.forEach(function(recording) {
+                    displayRecordingInTimeline(recording);
+                });
+
+                console.log('✅ Restored', savedRecordings.length, 'recording(s) from previous session');
+            }
+        }).catch(function(error) {
+            console.warn('⚠️ Could not restore recordings:', error);
+        });
+
+        // 피드백 체크리스트 상태 복원
+        const savedFeedback = localStorage.getItem('feedbackChecklist');
+        if (savedFeedback) {
+            try {
+                const fbState = JSON.parse(savedFeedback);
+                fbState.forEach(function(item) {
+                    const checkbox = document.getElementById(item.id);
+                    if (checkbox) {
+                        checkbox.checked = item.checked;
+                        if (item.checked) {
+                            checkbox.closest('.feedback-item').classList.add('checked');
+                        }
+                    }
+                });
+                console.log('✅ Restored feedback checklist state');
+            } catch(e) { /* ignore parse errors */ }
+        }
 
         // ============================================
         // VIDEO UPLOAD FUNCTIONALITY
@@ -1700,6 +2344,14 @@
         // Flag to track if we're actively recording (to prevent transcript reset on auto-restart)
         let isRecording = false;
 
+        // Flag to track if recording is intentionally paused
+        // (prevents recognition.onend from auto-restarting recognition during pause)
+        let isRecordingPaused = false;
+
+        // Flag to track whether SpeechRecognition is currently active
+        // Used to decide whether onstop should call recognition.stop() or save directly
+        let recognitionRunning = false;
+
         // Store the video time when recording started (to calculate audio offsets)
         let recordingStartVideoTime = 0;
 
@@ -1870,6 +2522,7 @@
 
             // Event: When recognition starts
             recognition.onstart = function() {
+                recognitionRunning = true;
                 console.log('🎤 Speech recognition started');
 
                 // Only reset transcript if this is a NEW recording session
@@ -1886,11 +2539,13 @@
 
             // Event: When recognition ends
             recognition.onend = function() {
+                recognitionRunning = false;
                 console.log('🎤 Speech recognition ended');
                 console.log('📝 Final complete transcript:', finalTranscript);
 
                 // If we're still recording (recognition auto-stopped), restart it
-                if (isRecording && !pendingRecording) {
+                // But NOT if recording is intentionally paused (isRecordingPaused=true)
+                if (isRecording && !pendingRecording && !isRecordingPaused) {
                     console.log('⚠️ Recognition auto-stopped during recording, restarting...');
 
                     // Save any interim text BEFORE restarting!
@@ -1906,6 +2561,12 @@
                     }
 
                     try {
+                        // Explicitly set language again before restarting
+                        // (ensures language stays correct even after browser resets it)
+                        const selectedLanguage = practiceMode === 'shadowing'
+                            ? sourceLanguage.value
+                            : targetLanguage.value;
+                        recognition.lang = selectedLanguage;
                         recognition.start();
                     } catch (error) {
                         console.error('Error restarting recognition:', error);
@@ -1915,49 +2576,7 @@
 
                 // If there's a pending recording, save it now with the complete transcript
                 if (pendingRecording) {
-                    console.log('💾 Saving recording with complete transcript...');
-
-                    // Save any remaining interim text as a final segment
-                    // (This catches text that was still being processed when recording stopped)
-                    if (lastInterimTranscript) {
-                        console.log('📝 Saving remaining interim text:', lastInterimTranscript);
-                        transcriptSegments.push({
-                            time: getNextSegmentTime(),
-                            text: lastInterimTranscript
-                        });
-                        finalTranscript += lastInterimTranscript + ' ';
-                        lastInterimTranscript = '';
-                    }
-
-                    // Add the final transcript to the recording
-                    pendingRecording.transcript = finalTranscript.trim();
-
-                    // Add timestamped segments to the recording
-                    pendingRecording.segments = [...transcriptSegments];  // Copy the array
-
-                    // Save to the recordings array
-                    recordedAudios.push(pendingRecording);
-                    console.log('✅ Recording saved with transcript:', pendingRecording.transcript);
-                    console.log('   Segments:', pendingRecording.segments);
-
-                    // Post-recording analysis
-                    analyzeFillerWords(pendingRecording.transcript);
-                    analyzeSentenceLength(pendingRecording.segments);
-
-                    // Enable export button (now we have something to export!)
-                    exportBtn.disabled = false;
-
-                    // Display this recording in the timeline
-                    displayRecordingInTimeline(pendingRecording);
-
-                    // Clear pending recording
-                    pendingRecording = null;
-
-                    // Reset transcripts for next recording
-                    currentTranscript = '';
-                    finalTranscript = '';
-                    transcriptSegments = [];  // Clear timestamped segments
-                    isRecording = false;  // Recording session is now complete
+                    finalizePendingRecording();
                 }
 
                 // Hide subtitle after 2 seconds
@@ -1976,6 +2595,52 @@
         } else {
             console.warn('⚠️ Speech recognition not supported in this browser');
             alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
+        }
+
+        // ============================================
+        // finalizePendingRecording: pendingRecording을 저장하는 공유 함수
+        // recognition.onend와 mediaRecorder.onstop(pause-stop 경우) 양쪽에서 호출됨
+        // ============================================
+        function finalizePendingRecording() {
+            if (!pendingRecording) return;
+            console.log('💾 Saving recording with complete transcript...');
+
+            // 아직 저장 안 된 interim 텍스트가 있으면 마지막 세그먼트로 저장
+            if (lastInterimTranscript) {
+                console.log('📝 Saving remaining interim text:', lastInterimTranscript);
+                transcriptSegments.push({
+                    time: getNextSegmentTime(),
+                    text: lastInterimTranscript
+                });
+                finalTranscript += lastInterimTranscript + ' ';
+                lastInterimTranscript = '';
+            }
+
+            pendingRecording.transcript = finalTranscript.trim();
+            pendingRecording.segments = [...transcriptSegments];
+
+            recordedAudios.push(pendingRecording);
+            console.log('✅ Recording saved:', pendingRecording.transcript);
+
+            saveRecordingToDB(pendingRecording);
+            uploadRecordingToServer(pendingRecording);
+
+            analyzeFillerWords(pendingRecording.transcript);
+            analyzeSentenceLength(pendingRecording.segments);
+
+            exportBtn.disabled = false;
+            displayRecordingInTimeline(pendingRecording);
+
+            pendingRecording = null;
+            currentTranscript = '';
+            finalTranscript = '';
+            transcriptSegments = [];
+            isRecording = false;
+
+            // 자막 숨기기
+            setTimeout(function() {
+                subtitleOverlay.classList.remove('active');
+            }, 2000);
         }
 
         // Update recognition language when target language changes
@@ -2059,14 +2724,15 @@
 
                     console.log('⏳ Recording prepared, waiting for transcript to complete...');
 
-                    // Stop speech recognition (transcript will be saved in recognition.onend)
-                    if (recognition) {
+                    if (recognition && recognitionRunning) {
+                        // Normal case: recognition is running → stop it → onend will save
                         recognition.stop();
+                    } else {
+                        // Pause-then-stop case: recognition already stopped (from pause)
+                        // Save directly without waiting for recognition.onend
+                        console.log('⚡ Recognition already stopped (was paused), saving directly...');
+                        finalizePendingRecording();
                     }
-
-                    // Reset transcript (will be done after saving in recognition.onend)
-                    // currentTranscript = '';
-                    // finalTranscript = '';
                 };
 
                 // Start recording!
@@ -2137,7 +2803,9 @@
         // STOP RECORDING
         // ============================================
         stopRecordBtn.addEventListener('click', function() {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
+            // Works from both 'recording' AND 'paused' states
+            if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
+                isRecordingPaused = false;  // Allow recognition.onend to handle final transcript
                 // Stop the recording
                 mediaRecorder.stop();
 
@@ -2177,8 +2845,9 @@
 
             if (mediaRecorder.state === 'recording') {
                 // Pause recording
+                isRecordingPaused = true;  // Tell onend NOT to auto-restart recognition
                 mediaRecorder.pause();
-                if (recognition) recognition.stop();
+                if (recognition) recognition.stop();  // This triggers onend, but isRecordingPaused=true stops the loop
 
                 // Pause video too
                 if (isYouTubeActive && ytPlayer) {
@@ -2197,9 +2866,17 @@
 
             } else if (mediaRecorder.state === 'paused') {
                 // Resume recording
+                isRecordingPaused = false;  // Allow onend to auto-restart again
                 mediaRecorder.resume();
                 if (recognition) {
-                    try { recognition.start(); } catch(e) {}
+                    try {
+                        // Always set language explicitly before restarting
+                        const selectedLanguage = practiceMode === 'shadowing'
+                            ? sourceLanguage.value
+                            : targetLanguage.value;
+                        recognition.lang = selectedLanguage;
+                        recognition.start();
+                    } catch(e) {}
                 }
 
                 // Resume video too
@@ -2315,6 +2992,12 @@
                             recordedAudios.splice(recIdx, 1);
                         }
                         if (recordedAudios.length === 0) exportBtn.disabled = true;
+                        // IndexedDB + 서버에서도 완전 삭제
+                        deleteRecordingFromDB(recording.id);
+                        deleteRecordingFromServer(recording.id);
+                    } else {
+                        // 세그먼트만 줄어든 경우 → DB 업데이트
+                        updateRecordingInDB(recording);
                     }
 
                     // 4) Stop any playing audio and hide subtitle
@@ -2327,6 +3010,17 @@
                     console.log('🗑️ Segment deleted');
                 });
                 segmentClip.appendChild(deleteBtn);
+
+                // Add report button (📊) — shows on hover, top-left corner
+                var reportBtn = document.createElement('div');
+                reportBtn.className = 'segment-report-btn';
+                reportBtn.textContent = '📊';
+                reportBtn.title = '비교 리포트 보기 (Whisper vs 실시간 인식)';
+                reportBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showRecordingReport(recording.id);
+                });
+                segmentClip.appendChild(reportBtn);
 
                 // Click event: Show text + seek video (NO audio - just review)
                 segmentClip.addEventListener('click', function() {
@@ -2777,9 +3471,18 @@
         });
 
         // Checkbox styling: add 'checked' class to parent for strikethrough
+        // + localStorage에 체크 상태 저장
         document.querySelectorAll('.feedback-item input[type="checkbox"]').forEach(function(cb) {
             cb.addEventListener('change', function() {
                 this.closest('.feedback-item').classList.toggle('checked', this.checked);
+
+                // 모든 체크박스 상태를 localStorage에 저장
+                const allCheckboxes = document.querySelectorAll('.feedback-item input[type="checkbox"]');
+                const fbState = [];
+                allCheckboxes.forEach(function(c) {
+                    fbState.push({ id: c.id, checked: c.checked });
+                });
+                localStorage.setItem('feedbackChecklist', JSON.stringify(fbState));
             });
         });
 

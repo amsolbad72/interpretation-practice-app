@@ -52,6 +52,20 @@ except ImportError:
     WHISPER_AVAILABLE = False
     print("[WARNING] openai-whisper not installed. Run: pip install openai-whisper")
 
+try:
+    import anthropic as _anthropic_lib
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+    print("[WARNING] anthropic not installed. Run: pip install anthropic")
+
+try:
+    from google import genai as _genai_lib
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+    print("[WARNING] google-genai not installed. Run: pip install google-genai")
+
 whisper_model = None    # 로드된 모델 (None이면 아직 준비 안 됨)
 whisper_ready = False   # 모델 준비 완료 여부
 whisper_loading = False # 현재 로딩 중인지
@@ -563,6 +577,156 @@ async def get_recording_report(recording_id: str):
         "stats":             stats,
         "suggestions":       suggestions,
     }
+
+
+# ============================================
+# Stage 4: Claude AI 피드백
+# ============================================
+
+@app.post("/api/recordings/{recording_id}/ai-feedback")
+async def get_ai_feedback(recording_id: str):
+    """
+    Claude AI를 이용한 통역 품질 피드백.
+
+    Whisper가 정확하게 인식한 텍스트를 Claude에게 보내서
+    통역 코치처럼 피드백을 받아와.
+
+    필요한 것:
+    - pip install anthropic
+    - ANTHROPIC_API_KEY 환경변수 설정
+    """
+    # Gemini 우선, 없으면 Claude 사용
+    gemini_key     = os.environ.get("GEMINI_API_KEY")
+    anthropic_key  = os.environ.get("ANTHROPIC_API_KEY")
+
+    if gemini_key and not GEMINI_AVAILABLE:
+        raise HTTPException(status_code=503, detail="google-generativeai 패키지가 없어. 'pip install google-generativeai' 실행해봐!")
+    if anthropic_key and not ANTHROPIC_AVAILABLE:
+        raise HTTPException(status_code=503, detail="anthropic 패키지가 없어. 'pip install anthropic' 실행해봐!")
+    if not gemini_key and not anthropic_key:
+        raise HTTPException(
+            status_code=503,
+            detail="GEMINI_API_KEY 또는 ANTHROPIC_API_KEY 환경변수를 설정해야 해!"
+        )
+
+    use_gemini = bool(gemini_key and GEMINI_AVAILABLE)
+
+    meta_path = RECORDINGS_DIR / f"rec_{recording_id}" / "metadata.json"
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail="녹음을 찾을 수 없어요")
+
+    with open(meta_path, "r", encoding="utf-8") as f:
+        meta = json.load(f)
+
+    # 이미 피드백이 있으면 캐시에서 반환 (API 비용 절약!)
+    if meta.get("aiFeedbackStatus") == "done" and meta.get("aiFeedback"):
+        print(f"[Claude] 캐시된 피드백 반환: rec_{recording_id}")
+        return {
+            "recordingId": recording_id,
+            "feedback": meta["aiFeedback"],
+            "cached": True,
+        }
+
+    whisper_text = meta.get("whisperTranscript", "")
+    if not whisper_text:
+        raise HTTPException(
+            status_code=400,
+            detail="Whisper 전사가 아직 완료되지 않았어. 리포트에서 Whisper 상태 확인해봐!"
+        )
+
+    web_speech_text = meta.get("transcript", "")
+    practice_mode   = meta.get("practiceMode", "simultaneous")
+    source_language = meta.get("sourceLanguage", "")
+    target_language = meta.get("targetLanguage", "")
+    duration        = float(meta.get("duration", 0))
+
+    # 연습 유형 한국어 설명
+    if practice_mode == "shadowing":
+        mode_desc = "섀도잉 (원어민 발화를 그대로 따라하는 연습)"
+        lang_desc = f"언어: {target_language}" if target_language else ""
+    else:
+        mode_desc = "동시통역"
+        if source_language and target_language:
+            lang_desc = f"{source_language} → {target_language}"
+        else:
+            lang_desc = ""
+
+    # Claude에게 보낼 프롬프트
+    prompt = f"""당신은 전문 통역 및 외국어 발화 코치입니다.
+아래는 통역 연습생이 '{mode_desc}' 연습을 한 결과입니다.
+{f'({lang_desc})' if lang_desc else ''}
+
+[발화 시간]
+약 {round(duration)}초
+
+[AI(Whisper)가 정확히 인식한 연습생의 발화]
+{whisper_text}
+
+[참고: 브라우저 실시간 음성인식 결과]
+{web_speech_text if web_speech_text else "(없음)"}
+
+위 발화를 분석하여 다음 형식으로 한국어 코칭 피드백을 제공해 주세요.
+(발화 내용만 보고 평가하세요. 음질이나 배경 소음은 고려하지 않아도 됩니다.)
+
+## 🎯 전반적 평가
+(2-3문장. 전체적인 발화 품질과 수준을 평가해 주세요.)
+
+## ✅ 잘한 점
+- (구체적으로 칭찬할 점 2-3가지)
+
+## 🔧 개선이 필요한 부분
+- (구체적인 피드백 2-3가지)
+
+## 💪 이렇게 연습해 보세요
+- (약점을 보완할 수 있는 실용적인 연습 방법 2가지)
+
+핵심만 간결하게, 한국어로 작성해 주세요."""
+
+    ai_provider = "Gemini" if use_gemini else "Claude"
+    print(f"[{ai_provider}] AI 피드백 생성 시작: rec_{recording_id}")
+
+    try:
+        if use_gemini:
+            client = _genai_lib.Client(api_key=gemini_key)
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt,
+            )
+            feedback_text = response.text
+        else:
+            client = _anthropic_lib.Anthropic(api_key=anthropic_key)
+            message = client.messages.create(
+                model="claude-opus-4-6",
+                max_tokens=1024,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            feedback_text = message.content[0].text
+
+        # metadata.json에 저장 (다음에 같은 요청이 오면 캐시에서 반환)
+        meta["aiFeedback"] = feedback_text
+        meta["aiFeedbackStatus"] = "done"
+        meta["aiFeedbackProvider"] = ai_provider
+        meta["aiFeedbackGeneratedAt"] = datetime.now().isoformat()
+
+        with open(meta_path, "w", encoding="utf-8") as f:
+            json.dump(meta, f, ensure_ascii=False, indent=2)
+
+        print(f"[{ai_provider}] 피드백 완료: rec_{recording_id} ({len(feedback_text)}자)")
+
+        return {
+            "recordingId": recording_id,
+            "feedback": feedback_text,
+            "cached": False,
+            "provider": ai_provider,
+        }
+
+    except Exception as e:
+        error_msg = str(e)
+        print(f"[{ai_provider}] 오류: {error_msg}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"{ai_provider} API 오류: {error_msg}"
+        )
 
 
 # ============================================

@@ -6,6 +6,10 @@ __pycache__/
 # Server recordings (personal data, large audio files)
 server/recordings/
 
+# API 키 (절대 GitHub에 올리면 안 됨!)
+server/.env
+.env
+
 # OS files
 .DS_Store
 Thumbs.db

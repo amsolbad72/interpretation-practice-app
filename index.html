@@ -7,6 +7,8 @@
 
     <!-- YouTube IFrame Player API -->
     <script src="https://www.youtube.com/iframe_api"></script>
+    <!-- JSZip: ZIP 파일 생성 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
         /* Basic page settings */
@@ -608,6 +610,7 @@
             vertical-align: middle;
         }
 
+
         /* Selected state: when user clicks a segment to review */
         .transcript-segment.selected {
             border-color: #fff;
@@ -1097,79 +1100,6 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
         }
 
-        /* Feedback checklist */
-        .feedback-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: rgba(0, 0, 0, 0.9);
-            border: 1px solid #555;
-            border-radius: 10px;
-            padding: 16px;
-            z-index: 300;
-            width: 280px;
-            display: none;
-        }
-
-        .feedback-panel.active {
-            display: block;
-        }
-
-        .feedback-panel h3 {
-            color: #fff;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .feedback-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-
-        .feedback-item input[type="checkbox"] {
-            margin-top: 3px;
-            accent-color: #4caf50;
-            width: 16px;
-            height: 16px;
-        }
-
-        .feedback-item label {
-            color: #ccc;
-            font-size: 13px;
-            cursor: pointer;
-            line-height: 1.4;
-        }
-
-        .feedback-item.checked label {
-            color: #4caf50;
-            text-decoration: line-through;
-        }
-
-        .feedback-toggle-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 48px;
-            height: 48px;
-            background-color: #555;
-            color: #fff;
-            border: 2px solid #888;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        .feedback-toggle-btn:hover {
-            background-color: #666;
-        }
 
         /* Sight Translation (ST) mode */
         .st-overlay {
@@ -1463,31 +1393,6 @@
         </div>
     </div>
 
-    <!-- Feedback Checklist -->
-    <button class="feedback-toggle-btn" id="feedback-toggle-btn" title="피드백 체크리스트">📋</button>
-    <div class="feedback-panel" id="feedback-panel">
-        <h3>📋 피드백 체크리스트</h3>
-        <div class="feedback-item" id="fb-1">
-            <input type="checkbox" id="fb-check-1">
-            <label for="fb-check-1">동사 처리가 늦지 않았는가?</label>
-        </div>
-        <div class="feedback-item" id="fb-2">
-            <input type="checkbox" id="fb-check-2">
-            <label for="fb-check-2">문장이 너무 길어서 꼬이지 않았는가? (Salami technique)</label>
-        </div>
-        <div class="feedback-item" id="fb-3">
-            <input type="checkbox" id="fb-check-3">
-            <label for="fb-check-3">내 목소리가 연사를 덮어버리지 않았는가?</label>
-        </div>
-        <div class="feedback-item" id="fb-4">
-            <input type="checkbox" id="fb-check-4">
-            <label for="fb-check-4">추임새(어, 음)를 쓰지 않았는가?</label>
-        </div>
-        <div class="feedback-item" id="fb-5">
-            <input type="checkbox" id="fb-check-5">
-            <label for="fb-check-5">빠뜨린 핵심 내용이 없는가?</label>
-        </div>
-    </div>
 
     <!-- Dual Tasking Counter (shadowing mode) -->
     <div class="dual-task-overlay" id="dual-task-overlay">
@@ -1726,10 +1631,6 @@
             .then(function(response) { return response.json(); })
             .then(function(result) {
                 console.log('☁️ 서버 업로드 성공:', result.message);
-                // Whisper 전사가 pending이면 결과 폴링 시작
-                if (result.whisperStatus === 'pending') {
-                    startWhisperPolling(result.recordingId);
-                }
                 return true;
             })
             .catch(function(error) {
@@ -1759,97 +1660,8 @@
         // 페이지 로드 시 서버 상태 확인
         checkServerStatus();
 
-        // Whisper 전사 결과 폴링 (업로드 후 완료될 때까지 2초마다 체크)
-        // 동시에 여러 녹음이 전사 중일 수 있어서 Map으로 관리
-        const whisperPollingTimers = new Map();  // recordingId → setInterval ID
-
-        function startWhisperPolling(recordingId) {
-            if (!isServerAvailable) return;
-            if (whisperPollingTimers.has(recordingId)) return;  // 이미 폴링 중
-
-            console.log('[Whisper] 결과 기다리는 중... (2초마다 체크)');
-
-            const timerId = setInterval(function() {
-                fetch(SERVER_URL + '/api/recordings/' + recordingId)
-                    .then(function(r) { return r.json(); })
-                    .then(function(meta) {
-                        const status = meta.whisperStatus;
-
-                        if (status === 'done') {
-                            // 전사 완료!
-                            clearInterval(timerId);
-                            whisperPollingTimers.delete(recordingId);
-                            onWhisperDone(recordingId, meta);
-
-                        } else if (status === 'error' || status === 'unavailable' || status === 'skipped') {
-                            // 오류 또는 불가 → 폴링 중단
-                            clearInterval(timerId);
-                            whisperPollingTimers.delete(recordingId);
-                            console.warn('[Whisper] 전사 실패/불가:', status, meta.whisperError || '');
-                        }
-                        // 'pending' 이면 계속 기다림
-                    })
-                    .catch(function() {
-                        // 서버 연결 끊어지면 폴링 중단
-                        clearInterval(timerId);
-                        whisperPollingTimers.delete(recordingId);
-                    });
-            }, 2000);  // 2초마다
-
-            whisperPollingTimers.set(recordingId, timerId);
-        }
-
-        function onWhisperDone(recordingId, meta) {
-            // 메모리의 recording 객체에도 Whisper 결과 반영
-            const recording = recordedAudios.find(function(r) { return r.id == recordingId; });
-            if (recording) {
-                recording.whisperTranscript = meta.whisperTranscript;
-                recording.whisperSegments = meta.whisperSegments;
-                recording.whisperLanguage = meta.whisperLanguage;
-            }
-
-            // 타임라인 세그먼트 툴팁 업데이트 (마우스 올리면 Whisper 텍스트 보임)
-            document.querySelectorAll('[data-recording-id="' + recordingId + '"]').forEach(function(el) {
-                const segIdx = parseInt(el.dataset.segmentIndex);
-                const wSeg = meta.whisperSegments && meta.whisperSegments[segIdx];
-                if (wSeg) {
-                    el.title = '[Web Speech] ' + el.dataset.text + '\n[Whisper] ' + wSeg.text;
-                }
-            });
-
-            // 화면에 완료 알림 표시
-            showWhisperNotification(meta.whisperTranscript);
-
-            console.log('[Whisper] 전사 완료! 언어:', meta.whisperLanguage);
-            console.log('[Whisper] 텍스트:', meta.whisperTranscript);
-        }
-
-        function showWhisperNotification(transcript) {
-            // 기존 알림 제거
-            const existing = document.getElementById('whisper-notification');
-            if (existing) existing.remove();
-
-            const notif = document.createElement('div');
-            notif.id = 'whisper-notification';
-            notif.style.cssText = [
-                'position:fixed', 'bottom:20px', 'right:20px', 'z-index:9999',
-                'background:#1a3a1a', 'border:1px solid #4caf50', 'border-radius:8px',
-                'padding:12px 16px', 'color:#fff', 'font-size:13px', 'max-width:340px',
-                'box-shadow:0 4px 12px rgba(0,0,0,0.5)'
-            ].join(';');
-            notif.innerHTML =
-                '<div style="color:#4caf50;font-weight:bold;margin-bottom:6px">✅ Whisper 전사 완료</div>' +
-                '<div style="color:#ccc;font-size:11px;line-height:1.5">' +
-                (transcript ? transcript.slice(0, 120) + (transcript.length > 120 ? '...' : '') : '(텍스트 없음)') +
-                '</div>' +
-                '<div style="color:#666;font-size:10px;margin-top:6px">타임라인 세그먼트에 마우스를 올려보세요</div>';
-
-            document.body.appendChild(notif);
-            setTimeout(function() { if (notif.parentNode) notif.remove(); }, 7000);
-        }
-
         // ============================================
-        // Stage 3: 비교 리포트
+        // 리포트
         // ============================================
 
         // 특정 녹음의 리포트를 서버에서 가져와서 모달로 보여주는 함수
@@ -1879,78 +1691,22 @@
             var existing = document.getElementById('report-modal-overlay');
             if (existing) existing.remove();
 
-            var stats = report.stats || {};
-            var fillers = stats.fillerWords || {};
-            var fillerEntries = Object.entries(fillers);
-
-            // 유사도 색상 (높을수록 초록, 낮을수록 빨강)
-            var sim = stats.similarity || 0;
-            var simColor = sim >= 70 ? '#4caf50' : sim >= 40 ? '#ff9800' : '#f44336';
-
-            // 필러워드 태그 HTML
-            var fillerHtml = fillerEntries.length > 0
-                ? '<div class="report-section"><h3>💬 필러워드 (총 ' + stats.totalFillerWords + '개)</h3>' +
-                  '<div class="report-filler-tags">' +
-                  fillerEntries.map(function(e) {
-                      return '<span class="report-filler-tag">' + e[0] + ' × ' + e[1] + '</span>';
-                  }).join('') +
-                  '</div></div>'
-                : '';
-
-            // 개선 제안 HTML
-            var suggestions = report.suggestions || [];
-            var suggestionHtml = suggestions.map(function(s) {
-                return '<li>' + s + '</li>';
-            }).join('');
-
             var overlay = document.createElement('div');
             overlay.className = 'report-modal-overlay';
             overlay.id = 'report-modal-overlay';
 
             overlay.innerHTML =
                 '<div class="report-modal">' +
-                    '<h2>📊 녹음 비교 리포트</h2>' +
+                    '<h2>📊 통역 리포트</h2>' +
 
                     '<div class="report-section">' +
-                        '<h3>🎤 Web Speech (브라우저 실시간 인식)</h3>' +
+                        '<h3>🎤 내 통역 텍스트</h3>' +
                         '<div class="report-transcript-box">' +
                             (report.webSpeechTranscript || '(저장된 텍스트 없음)') +
                         '</div>' +
                     '</div>' +
 
-                    '<div class="report-section">' +
-                        '<h3>🤖 Whisper (AI 정밀 전사)</h3>' +
-                        '<div class="report-transcript-box">' +
-                            (report.whisperTranscript || '(저장된 텍스트 없음)') +
-                        '</div>' +
-                    '</div>' +
-
-                    '<div class="report-section">' +
-                        '<h3>📈 통계</h3>' +
-                        '<div class="report-stats-grid">' +
-                            '<div class="report-stat">' +
-                                '<div class="stat-value">' + (stats.whisperWordCount || 0) + '</div>' +
-                                '<div class="stat-label">단어 수</div>' +
-                            '</div>' +
-                            '<div class="report-stat">' +
-                                '<div class="stat-value">' + (stats.wordsPerMinute || 0) + '</div>' +
-                                '<div class="stat-label">단어/분 (WPM)</div>' +
-                            '</div>' +
-                            '<div class="report-stat">' +
-                                '<div class="stat-value" style="color:' + simColor + '">' + sim + '%</div>' +
-                                '<div class="stat-label">인식 정확도</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-
-                    fillerHtml +
-
-                    '<div class="report-section">' +
-                        '<h3>💡 개선 제안</h3>' +
-                        '<ul class="report-suggestions">' + suggestionHtml + '</ul>' +
-                    '</div>' +
-
-                    '<button class="ai-feedback-btn" id="ai-feedback-btn">🤖 Claude AI 피드백 받기</button>' +
+                    '<button class="ai-feedback-btn" id="ai-feedback-btn">🤖 AI 피드백 받기</button>' +
                     '<div id="ai-feedback-result-area"></div>' +
                     '<button class="report-close-btn" id="report-close-btn">닫기</button>' +
                 '</div>';
@@ -1971,6 +1727,7 @@
                 if (e.target === overlay) overlay.remove();
             });
         }
+
 
         // AI 피드백 요청 함수
         function requestAIFeedback(recordingId) {
@@ -2231,23 +1988,6 @@
             console.warn('⚠️ Could not restore recordings:', error);
         });
 
-        // 피드백 체크리스트 상태 복원
-        const savedFeedback = localStorage.getItem('feedbackChecklist');
-        if (savedFeedback) {
-            try {
-                const fbState = JSON.parse(savedFeedback);
-                fbState.forEach(function(item) {
-                    const checkbox = document.getElementById(item.id);
-                    if (checkbox) {
-                        checkbox.checked = item.checked;
-                        if (item.checked) {
-                            checkbox.closest('.feedback-item').classList.add('checked');
-                        }
-                    }
-                });
-                console.log('✅ Restored feedback checklist state');
-            } catch(e) { /* ignore parse errors */ }
-        }
 
         // ============================================
         // VIDEO UPLOAD FUNCTIONALITY
@@ -2346,6 +2086,12 @@
         });
 
         // When local video starts playing
+        // 더블클릭 전체화면 방지
+        mainVideo.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
         mainVideo.addEventListener('play', function() {
             // Setup audio visualizer on first play
             if (!audioContext) {
@@ -3488,13 +3234,16 @@
         // ============================================
         // EXPORT RECORDINGS
         // ============================================
-        exportBtn.addEventListener('click', function() {
+        exportBtn.addEventListener('click', async function() {
             if (recordedAudios.length === 0) {
                 alert('No recordings to export!');
                 return;
             }
 
-            // 1) Export transcript as .txt file
+            exportBtn.disabled = true;
+            exportBtn.textContent = '⏳ 압축 중...';
+
+            // 전체 대본 텍스트 만들기
             let transcriptContent = '=== Interpretation Practice Transcript ===\n';
             transcriptContent += 'Date: ' + new Date().toLocaleString() + '\n\n';
 
@@ -3517,24 +3266,28 @@
                 transcriptContent += '\n';
             });
 
-            // Create and download the text file
-            const textBlob = new Blob([transcriptContent], { type: 'text/plain' });
-            const textUrl = URL.createObjectURL(textBlob);
-            const textLink = document.createElement('a');
-            textLink.href = textUrl;
-            textLink.download = 'interpretation_transcript_' + Date.now() + '.txt';
-            textLink.click();
-            URL.revokeObjectURL(textUrl);
+            // ZIP 파일에 모두 묶기
+            const zip = new JSZip();
+            zip.file('transcript.txt', transcriptContent);
 
-            // 2) Export each audio recording as .webm file
-            recordedAudios.forEach(function(recording, index) {
-                const audioLink = document.createElement('a');
-                audioLink.href = recording.url;
-                audioLink.download = 'recording_' + (index + 1) + '_' + Date.now() + '.webm';
-                audioLink.click();
-            });
+            for (let i = 0; i < recordedAudios.length; i++) {
+                const recording = recordedAudios[i];
+                const blob = recording.blob || await fetch(recording.url).then(r => r.blob());
+                zip.file('recording_' + (i + 1) + '.webm', blob);
+            }
 
-            console.log('💾 Exported ' + recordedAudios.length + ' recording(s) + transcript');
+            // ZIP 다운로드
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(zipBlob);
+            const dateStr = new Date().toISOString().slice(0, 10);
+            link.download = 'interpretation_' + dateStr + '.zip';
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            exportBtn.disabled = false;
+            exportBtn.textContent = '💾 Export';
+            console.log('💾 Exported ' + recordedAudios.length + ' recording(s) as ZIP');
         });
 
         // ============================================
@@ -3617,31 +3370,6 @@
             clearInterval(stTimerInterval);
         });
 
-        // ============================================
-        // FEEDBACK CHECKLIST
-        // ============================================
-        const feedbackToggleBtn = document.getElementById('feedback-toggle-btn');
-        const feedbackPanel = document.getElementById('feedback-panel');
-
-        feedbackToggleBtn.addEventListener('click', function() {
-            feedbackPanel.classList.toggle('active');
-        });
-
-        // Checkbox styling: add 'checked' class to parent for strikethrough
-        // + localStorage에 체크 상태 저장
-        document.querySelectorAll('.feedback-item input[type="checkbox"]').forEach(function(cb) {
-            cb.addEventListener('change', function() {
-                this.closest('.feedback-item').classList.toggle('checked', this.checked);
-
-                // 모든 체크박스 상태를 localStorage에 저장
-                const allCheckboxes = document.querySelectorAll('.feedback-item input[type="checkbox"]');
-                const fbState = [];
-                allCheckboxes.forEach(function(c) {
-                    fbState.push({ id: c.id, checked: c.checked });
-                });
-                localStorage.setItem('feedbackChecklist', JSON.stringify(fbState));
-            });
-        });
 
         // ============================================
         // PRACTICE MODE TOGGLE (Interpretation ↔ Shadowing)

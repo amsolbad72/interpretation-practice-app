@@ -33,18 +33,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-try:
-    import anthropic as _anthropic_lib
-    ANTHROPIC_AVAILABLE = True
-except ImportError:
-    ANTHROPIC_AVAILABLE = False
-
-try:
-    from google import genai as _genai_lib
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
-    print("[WARNING] google-genai not installed. Run: pip install google-genai")
 
 
 # ============================================
@@ -180,108 +168,6 @@ async def get_recording_report(recording_id: str):
         "targetLanguage":      meta.get("targetLanguage", ""),
     }
 
-
-# ============================================
-# AI 피드백
-# ============================================
-
-@app.post("/api/recordings/{recording_id}/ai-feedback")
-async def get_ai_feedback(recording_id: str):
-    """Gemini / Claude AI 통역 코칭 피드백"""
-    gemini_key    = os.environ.get("GEMINI_API_KEY")
-    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
-
-    if not gemini_key and not anthropic_key:
-        raise HTTPException(status_code=503,
-            detail="GEMINI_API_KEY 또는 ANTHROPIC_API_KEY 환경변수를 설정해야 해!")
-
-    use_gemini = bool(gemini_key and GEMINI_AVAILABLE)
-
-    meta_path = RECORDINGS_DIR / f"rec_{recording_id}" / "metadata.json"
-    if not meta_path.exists():
-        raise HTTPException(status_code=404, detail="녹음을 찾을 수 없어요")
-
-    with open(meta_path, "r", encoding="utf-8") as f:
-        meta = json.load(f)
-
-    # 캐시된 피드백이 있으면 바로 반환
-    if meta.get("aiFeedbackStatus") == "done" and meta.get("aiFeedback"):
-        return {"recordingId": recording_id, "feedback": meta["aiFeedback"], "cached": True}
-
-    transcript = meta.get("transcript", "")
-    if not transcript:
-        raise HTTPException(status_code=400,
-            detail="저장된 전사 텍스트가 없어. 녹음 후 말을 해야 피드백을 받을 수 있어!")
-
-    practice_mode   = meta.get("practiceMode", "simultaneous")
-    source_language = meta.get("sourceLanguage", "")
-    target_language = meta.get("targetLanguage", "")
-    duration        = float(meta.get("duration", 0))
-
-    if practice_mode == "shadowing":
-        mode_desc = "섀도잉 (원어민 발화를 그대로 따라하는 연습)"
-        lang_desc = f"언어: {target_language}" if target_language else ""
-    else:
-        mode_desc = "동시통역"
-        lang_desc = f"{source_language} → {target_language}" if source_language and target_language else ""
-
-    prompt = f"""당신은 전문 통역 및 외국어 발화 코치입니다.
-아래는 통역 연습생이 '{mode_desc}' 연습을 한 결과입니다.
-{f'({lang_desc})' if lang_desc else ''}
-
-[발화 시간]
-약 {round(duration)}초
-
-[연습생의 발화 (음성인식 결과)]
-{transcript}
-
-위 발화를 분석하여 다음 형식으로 한국어 코칭 피드백을 제공해 주세요.
-(발화 내용만 보고 평가하세요. 음질이나 배경 소음은 고려하지 않아도 됩니다.)
-
-## 🎯 전반적 평가
-(2-3문장. 전체적인 발화 품질과 수준을 평가해 주세요.)
-
-## ✅ 잘한 점
-- (구체적으로 칭찬할 점 2-3가지)
-
-## 🔧 개선이 필요한 부분
-- (구체적인 피드백 2-3가지)
-
-## 💪 이렇게 연습해 보세요
-- (약점을 보완할 수 있는 실용적인 연습 방법 2가지)
-
-핵심만 간결하게, 한국어로 작성해 주세요."""
-
-    ai_provider = "Gemini" if use_gemini else "Claude"
-    print(f"[{ai_provider}] 피드백 생성 시작: rec_{recording_id}")
-
-    try:
-        if use_gemini:
-            client = _genai_lib.Client(api_key=gemini_key)
-            response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
-            feedback_text = response.text
-        else:
-            client = _anthropic_lib.Anthropic(api_key=anthropic_key)
-            message = client.messages.create(
-                model="claude-opus-4-6", max_tokens=1024,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            feedback_text = message.content[0].text
-
-        meta["aiFeedback"] = feedback_text
-        meta["aiFeedbackStatus"] = "done"
-        meta["aiFeedbackProvider"] = ai_provider
-        meta["aiFeedbackGeneratedAt"] = datetime.now().isoformat()
-
-        with open(meta_path, "w", encoding="utf-8") as f:
-            json.dump(meta, f, ensure_ascii=False, indent=2)
-
-        print(f"[{ai_provider}] 피드백 완료: rec_{recording_id}")
-        return {"recordingId": recording_id, "feedback": feedback_text, "cached": False, "provider": ai_provider}
-
-    except Exception as e:
-        print(f"[{ai_provider}] 오류: {e}")
-        raise HTTPException(status_code=500, detail=f"{ai_provider} API 오류: {str(e)}")
 
 
 # ============================================

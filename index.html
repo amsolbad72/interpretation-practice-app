@@ -533,82 +533,6 @@
         }
 
         /* AI 피드백 버튼 */
-        .ai-feedback-btn {
-            display: block;
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .ai-feedback-btn:hover {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-        }
-
-        .ai-feedback-btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* AI 피드백 결과 영역 */
-        .ai-feedback-result {
-            margin-top: 14px;
-            padding: 14px;
-            background: #1a1340;
-            border: 1px solid #6366f1;
-            border-radius: 8px;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #e0e0e0;
-        }
-
-        .ai-feedback-result h3 {
-            font-size: 14px;
-            color: #a78bfa;
-            margin: 12px 0 6px;
-        }
-
-        .ai-feedback-result h3:first-child {
-            margin-top: 0;
-        }
-
-        .ai-feedback-result ul {
-            margin: 4px 0 8px 18px;
-        }
-
-        .ai-feedback-result li {
-            margin-bottom: 4px;
-        }
-
-        .ai-feedback-result p {
-            margin-bottom: 6px;
-        }
-
-        .ai-feedback-loading {
-            text-align: center;
-            padding: 20px;
-            color: #a78bfa;
-            font-size: 13px;
-        }
-
-        .ai-feedback-cached-badge {
-            display: inline-block;
-            font-size: 10px;
-            background: #333;
-            color: #888;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
 
 
         /* Selected state: when user clicks a segment to review */
@@ -1706,17 +1630,10 @@
                         '</div>' +
                     '</div>' +
 
-                    '<button class="ai-feedback-btn" id="ai-feedback-btn">🤖 AI 피드백 받기</button>' +
-                    '<div id="ai-feedback-result-area"></div>' +
                     '<button class="report-close-btn" id="report-close-btn">닫기</button>' +
                 '</div>';
 
             document.body.appendChild(overlay);
-
-            // AI 피드백 버튼 클릭
-            document.getElementById('ai-feedback-btn').addEventListener('click', function() {
-                requestAIFeedback(report.recordingId);
-            });
 
             // 닫기 버튼
             document.getElementById('report-close-btn').addEventListener('click', function() {
@@ -1729,77 +1646,6 @@
         }
 
 
-        // AI 피드백 요청 함수
-        function requestAIFeedback(recordingId) {
-            var btn = document.getElementById('ai-feedback-btn');
-            var resultArea = document.getElementById('ai-feedback-result-area');
-
-            // 로딩 상태
-            btn.disabled = true;
-            btn.textContent = '⏳ AI 피드백 생성 중... (10-20초 소요)';
-            resultArea.innerHTML = '<div class="ai-feedback-loading">🤖 Claude AI가 통역 내용을 분석하고 있어...<br>잠깐만 기다려봐!</div>';
-
-            fetch(SERVER_URL + '/api/recordings/' + recordingId + '/ai-feedback', {
-                method: 'POST',
-            })
-            .then(function(r) {
-                if (!r.ok) {
-                    return r.json().then(function(err) {
-                        throw new Error(err.detail || '서버 오류');
-                    });
-                }
-                return r.json();
-            })
-            .then(function(data) {
-                var cachedBadge = data.cached ? '<span class="ai-feedback-cached-badge">캐시됨</span>' : '';
-                btn.textContent = '🤖 Claude AI 피드백 받기' + (data.cached ? ' (저장된 결과)' : '');
-                btn.disabled = false;
-                resultArea.innerHTML =
-                    '<div class="ai-feedback-result">' +
-                    '<strong style="color:#a78bfa">✨ Claude AI 코칭 피드백</strong>' + cachedBadge +
-                    '<hr style="border-color:#333; margin: 8px 0">' +
-                    markdownToHtml(data.feedback) +
-                    '</div>';
-            })
-            .catch(function(err) {
-                btn.disabled = false;
-                btn.textContent = '🤖 Claude AI 피드백 받기';
-                resultArea.innerHTML =
-                    '<div class="ai-feedback-result" style="border-color:#f44336; background:#1a0a0a">' +
-                    '❌ 오류: ' + err.message +
-                    '</div>';
-            });
-        }
-
-        // 간단한 마크다운 → HTML 변환
-        // Claude가 ## 헤더, - 불릿, 일반 텍스트를 섞어서 응답하기 때문에
-        // 보기 좋게 변환해주는 함수야.
-        function markdownToHtml(text) {
-            var lines = text.split('\n');
-            var html = '';
-            var inList = false;
-
-            lines.forEach(function(line) {
-                line = line.trim();
-                if (!line) {
-                    if (inList) { html += '</ul>'; inList = false; }
-                    return;
-                }
-                if (line.startsWith('## ') || line.startsWith('# ')) {
-                    if (inList) { html += '</ul>'; inList = false; }
-                    html += '<h3>' + line.replace(/^#+\s*/, '') + '</h3>';
-                } else if (line.startsWith('- ') || line.startsWith('* ')) {
-                    if (!inList) { html += '<ul>'; inList = true; }
-                    html += '<li>' + line.replace(/^[-*]\s*/, '') + '</li>';
-                } else {
-                    if (inList) { html += '</ul>'; inList = false; }
-                    html += '<p>' + line + '</p>';
-                }
-            });
-
-            if (inList) html += '</ul>';
-            return html;
-        }
 
         // ============================================
         // GET ALL HTML ELEMENTS FIRST
